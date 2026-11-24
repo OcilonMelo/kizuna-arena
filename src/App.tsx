@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { HEROES } from './game/heroes';
+import { HEROES, HERO_LIST } from './game/heroes';
 import { TOWER_FLOORS } from './game/tower';
 import { loadSaveData, persistSaveData } from './game/storage';
 import { loadGameAssets } from './game/renderer';
@@ -8,10 +8,10 @@ import type { BattleResult, SaveData, TeamMemberConfig } from './game/types';
 import { TeamBuilder } from './components/TeamBuilder';
 import { BattleView } from './components/BattleView';
 
-type Mode = 'tower' | 'training';
+type Tab = 'hub' | 'tower' | 'team' | 'training';
 
 interface ActiveBattle {
-  mode: Mode;
+  mode: 'tower' | 'training';
   floorIndex?: number;
   title: string;
   subtitle?: string;
@@ -21,7 +21,8 @@ interface ActiveBattle {
 
 export function App() {
   const [save, setSave] = useState<SaveData>(() => loadSaveData());
-  const [mode, setMode] = useState<Mode>('tower');
+  const [tab, setTab] = useState<Tab>('hub');
+  const [trainingSide, setTrainingSide] = useState<'player' | 'enemy'>('player');
   const [selectedFloorIdx, setSelectedFloorIdx] = useState<number>(() =>
     Math.min(TOWER_FLOORS.length - 1, loadSaveData().highestFloorCleared)
   );
@@ -36,7 +37,9 @@ export function App() {
     persistSaveData(save);
   }, [save]);
 
+  const nextTowerIdx = Math.min(TOWER_FLOORS.length - 1, save.highestFloorCleared);
   const currentFloor = TOWER_FLOORS[selectedFloorIdx];
+  const nextFloor = TOWER_FLOORS[nextTowerIdx];
 
   const startTowerBattle = (floorIdx: number) => {
     const fl = TOWER_FLOORS[floorIdx];
@@ -80,40 +83,71 @@ export function App() {
     [activeBattle]
   );
 
+  const winRate =
+    save.totalBattles > 0 ? Math.round((save.totalWins / save.totalBattles) * 100) : 0;
+
   return (
     <div className="app-shell">
       <header className="top-nav">
-        <div className="brand">
+        <button
+          type="button"
+          className="brand-btn"
+          onClick={() => {
+            setActiveBattle(null);
+            setTab('hub');
+          }}
+        >
           <span className="brand-badge">3v3 PIXEL AUTO-BATTLER</span>
           <h1>KIZUNA ARENA</h1>
-        </div>
+        </button>
 
         <nav className="nav-tabs">
           <button
             type="button"
-            className={`nav-tab ${mode === 'tower' && !activeBattle ? 'active' : ''}`}
+            className={`nav-tab ${tab === 'hub' && !activeBattle ? 'active' : ''}`}
             onClick={() => {
               setActiveBattle(null);
-              setMode('tower');
+              setTab('hub');
             }}
           >
-            🗼 Torre de Batalha
+            🏠 HUB
           </button>
           <button
             type="button"
-            className={`nav-tab ${mode === 'training' && !activeBattle ? 'active' : ''}`}
+            className={`nav-tab ${tab === 'tower' && !activeBattle ? 'active' : ''}`}
             onClick={() => {
               setActiveBattle(null);
-              setMode('training');
+              setTab('tower');
             }}
           >
-            ⚔ Modo Treino
+            🗼 Torre
+          </button>
+          <button
+            type="button"
+            className={`nav-tab ${tab === 'team' && !activeBattle ? 'active' : ''}`}
+            onClick={() => {
+              setActiveBattle(null);
+              setTab('team');
+            }}
+          >
+            🛡 Meu Time
+          </button>
+          <button
+            type="button"
+            className={`nav-tab ${tab === 'training' && !activeBattle ? 'active' : ''}`}
+            onClick={() => {
+              setActiveBattle(null);
+              setTab('training');
+            }}
+          >
+            ⚔ Treino
           </button>
         </nav>
 
         <div className="profile-pill">
-          <span>Torre: {save.highestFloorCleared}/{TOWER_FLOORS.length}</span>
-          <span>Vitórias: {save.totalWins}</span>
+          <span>🗼 {save.highestFloorCleared}/{TOWER_FLOORS.length}</span>
+          <span>🏆 {save.totalWins}V</span>
+          <span>📊 {winRate}%</span>
         </div>
       </header>
 
@@ -139,18 +173,157 @@ export function App() {
             }}
             onExit={() => setActiveBattle(null)}
           />
-        ) : mode === 'tower' ? (
-          <div className="tower-layout">
-            {/* Left: Tower Floors & Enemy Preview */}
+        ) : tab === 'hub' ? (
+          <div className="hub-layout">
+            {/* Hero Showcase Stage */}
+            <section className="hub-hero-stage">
+              <div className="hub-stage-top">
+                <div>
+                  <span className="hub-eyebrow">SEU ESQUADRÃO ATIVO</span>
+                  <h2>Prontos para o Coliseu</h2>
+                </div>
+                <button
+                  type="button"
+                  className="secondary-btn"
+                  onClick={() => setTab('team')}
+                >
+                  ⚙ Editar Time & Golpes
+                </button>
+              </div>
+
+              <div className="hub-pedestal-row">
+                {save.playerTeam.map((member, idx) => {
+                  const def = HEROES[member.heroId];
+                  const ult =
+                    def.ultimates.find((u) => u.id === member.ultimateId) ??
+                    def.ultimates[0];
+                  return (
+                    <div
+                      key={idx}
+                      className="hub-hero-card"
+                      style={{ borderColor: def.color }}
+                    >
+                      <div className="hub-pos-pill">
+                        {member.slot.col === 'front'
+                          ? 'Frente'
+                          : member.slot.col === 'mid'
+                          ? 'Meio'
+                          : 'Retaguarda'}
+                      </div>
+                      <img
+                        src={def.spritePath}
+                        alt={def.name}
+                        className="pixel-sprite hub-showcase-sprite"
+                      />
+                      <strong>{def.name}</strong>
+                      <span className="hub-role-txt" style={{ color: def.color }}>
+                        {def.role}
+                      </span>
+                      <div className="hub-ult-pill">★ {ult.name}</div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="hub-mode-cards">
+                <button
+                  type="button"
+                  className="mode-card blue"
+                  onClick={() => setTab('tower')}
+                >
+                  <span className="mode-icon">🗼</span>
+                  <div>
+                    <strong>Torre de Batalha</strong>
+                    <span>
+                      {TOWER_FLOORS.length} andares progressivos com chefes
+                    </span>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  className="mode-card gold"
+                  onClick={() => setTab('team')}
+                >
+                  <span className="mode-icon">🛡</span>
+                  <div>
+                    <strong>Elenco ({HERO_LIST.length} Heróis)</strong>
+                    <span>Formação 3×3 e movesets customizáveis</span>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  className="mode-card red"
+                  onClick={() => setTab('training')}
+                >
+                  <span className="mode-icon">⚔</span>
+                  <div>
+                    <strong>Arena Treino</strong>
+                    <span>Monte os dois times e simule confrontos</span>
+                  </div>
+                </button>
+              </div>
+            </section>
+
+            {/* Quick Play Next Tower Challenge */}
+            <aside className="hub-play-panel">
+              <span className="hub-eyebrow">PRÓXIMO DESAFIO DA TORRE</span>
+              <h3>{nextFloor.name}</h3>
+              <p className="hub-play-sub">{nextFloor.subtitle}</p>
+
+              <div className="enemy-preview-row">
+                {nextFloor.enemyTeam.map((em, i) => {
+                  const def = HEROES[em.heroId];
+                  return (
+                    <div key={i} className="enemy-mini-card">
+                      <img
+                        src={def.spritePath}
+                        alt={def.name}
+                        className="pixel-sprite small"
+                      />
+                      <strong>{def.name}</strong>
+                      <span style={{ color: def.color }}>{def.role}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <button
+                type="button"
+                className="primary-btn play-cta full-width"
+                onClick={() => startTowerBattle(nextTowerIdx)}
+              >
+                ⚔ JOGAR AGORA — ANDAR {nextFloor.floor}
+              </button>
+
+              <div className="hub-mini-stats">
+                <div>
+                  <span>Andares Concluídos</span>
+                  <strong>
+                    {save.highestFloorCleared} / {TOWER_FLOORS.length}
+                  </strong>
+                </div>
+                <div>
+                  <span>Total de Batalhas</span>
+                  <strong>{save.totalBattles}</strong>
+                </div>
+                <div>
+                  <span>Taxa de Vitória</span>
+                  <strong>{winRate}%</strong>
+                </div>
+              </div>
+            </aside>
+          </div>
+        ) : tab === 'tower' ? (
+          <div className="tower-focused-layout">
             <section className="tower-panel">
               <div className="panel-title-row">
                 <h2>Torre de Batalha</h2>
                 <span className="progress-chip">
-                  Andar Máximo: {save.highestFloorCleared} / {TOWER_FLOORS.length}
+                  Progresso: {save.highestFloorCleared} / {TOWER_FLOORS.length}
                 </span>
               </div>
 
-              <div className="floor-list">
+              <div className="floor-list tall">
                 {TOWER_FLOORS.map((fl, idx) => {
                   const unlocked = idx <= save.highestFloorCleared;
                   const cleared = idx < save.highestFloorCleared;
@@ -177,64 +350,122 @@ export function App() {
                   );
                 })}
               </div>
+            </section>
 
-              <div className="enemy-preview-box">
-                <div className="tb-label">Time Inimigo — {currentFloor.name}</div>
-                <div className="enemy-preview-row">
-                  {currentFloor.enemyTeam.map((em, i) => {
-                    const def = HEROES[em.heroId];
-                    return (
-                      <div key={i} className="enemy-mini-card">
-                        <img
-                          src={def.spritePath}
-                          alt={def.name}
-                          className="pixel-sprite small"
-                        />
-                        <strong>{def.name}</strong>
-                        <span style={{ color: def.color }}>{def.role}</span>
-                      </div>
-                    );
-                  })}
+            <section className="tower-detail-panel">
+              <div className="panel-title-row">
+                <h2>{currentFloor.name}</h2>
+                {currentFloor.isBoss && <span className="boss-badge">CHEFE</span>}
+              </div>
+              <p className="hub-play-sub">{currentFloor.subtitle}</p>
+
+              <div className="vs-preview-split">
+                <div className="vs-box blue">
+                  <div className="tb-label">Seu Time</div>
+                  <div className="enemy-preview-row">
+                    {save.playerTeam.map((m, i) => {
+                      const def = HEROES[m.heroId];
+                      return (
+                        <div key={i} className="enemy-mini-card">
+                          <img
+                            src={def.spritePath}
+                            alt={def.name}
+                            className="pixel-sprite small"
+                          />
+                          <strong>{def.name}</strong>
+                          <span style={{ color: def.color }}>{def.role}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
+
+                <div className="vs-badge-big">VS</div>
+
+                <div className="vs-box red">
+                  <div className="tb-label">Inimigos do Andar {currentFloor.floor}</div>
+                  <div className="enemy-preview-row">
+                    {currentFloor.enemyTeam.map((em, i) => {
+                      const def = HEROES[em.heroId];
+                      return (
+                        <div key={i} className="enemy-mini-card">
+                          <img
+                            src={def.spritePath}
+                            alt={def.name}
+                            className="pixel-sprite small"
+                          />
+                          <strong>{def.name}</strong>
+                          <span style={{ color: def.color }}>{def.role}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div className="tower-cta-row">
                 <button
                   type="button"
-                  className="primary-btn full-width"
+                  className="secondary-btn"
+                  onClick={() => setTab('team')}
+                >
+                  🛡 Ajustar Meu Time
+                </button>
+                <button
+                  type="button"
+                  className="primary-btn play-cta"
                   onClick={() => startTowerBattle(selectedFloorIdx)}
                 >
                   ⚔ INICIAR BATALHA — ANDAR {currentFloor.floor}
                 </button>
               </div>
             </section>
-
-            {/* Right: Player Team Customizer */}
-            <section>
-              <TeamBuilder
-                title="Seu Time (Formação e Moveset)"
-                accent="blue"
-                team={save.playerTeam}
-                onChange={(next) => setSave((prev) => ({ ...prev, playerTeam: next }))}
-              />
-            </section>
+          </div>
+        ) : tab === 'team' ? (
+          <div className="team-studio-wrap">
+            <TeamBuilder
+              title="Estúdio de Time — Escolha seus 3 Heróis, Formação 3×3 e Moveset"
+              accent="blue"
+              team={save.playerTeam}
+              onChange={(next) => setSave((prev) => ({ ...prev, playerTeam: next }))}
+            />
           </div>
         ) : (
           <div className="training-layout">
             <div className="training-launch-bar">
-              <div>
-                <h2>Modo Treino — Arena Sandbox 3v3</h2>
-                <p>Configure os dois times, teste sinergias, posições e habilidades sem limites.</p>
+              <div className="training-side-tabs">
+                <button
+                  type="button"
+                  className={`nav-tab ${trainingSide === 'player' ? 'active' : ''}`}
+                  onClick={() => setTrainingSide('player')}
+                >
+                  🔵 Editar Seu Time
+                </button>
+                <button
+                  type="button"
+                  className={`nav-tab ${trainingSide === 'enemy' ? 'active' : ''}`}
+                  onClick={() => setTrainingSide('enemy')}
+                >
+                  🔴 Editar Time Adversário
+                </button>
               </div>
-              <button type="button" className="primary-btn" onClick={startTrainingBattle}>
+              <button
+                type="button"
+                className="primary-btn play-cta"
+                onClick={startTrainingBattle}
+              >
                 ⚔ INICIAR SIMULAÇÃO 3v3
               </button>
             </div>
 
-            <div className="training-grid">
+            {trainingSide === 'player' ? (
               <TeamBuilder
                 title="Seu Time (Azul)"
                 accent="blue"
                 team={save.playerTeam}
                 onChange={(next) => setSave((prev) => ({ ...prev, playerTeam: next }))}
               />
+            ) : (
               <TeamBuilder
                 title="Time Adversário (Vermelho)"
                 accent="red"
@@ -243,7 +474,7 @@ export function App() {
                   setSave((prev) => ({ ...prev, trainingEnemyTeam: next }))
                 }
               />
-            </div>
+            )}
           </div>
         )}
       </main>

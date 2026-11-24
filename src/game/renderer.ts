@@ -1,5 +1,5 @@
 import { ARENA_HEIGHT, ARENA_WIDTH, BattleEngine } from './engine';
-import type { HeroId, HeroRuntime } from './types';
+import type { HeroId, HeroRuntime, Projectile } from './types';
 import { HERO_LIST } from './heroes';
 
 export interface LoadedAssets {
@@ -30,7 +30,8 @@ export async function loadGameAssets(): Promise<LoadedAssets> {
 export function renderBattle(
   ctx: CanvasRenderingContext2D,
   engine: BattleEngine,
-  assets: LoadedAssets
+  assets: LoadedAssets,
+  showOverheadBars = true
 ): void {
   ctx.save();
   ctx.imageSmoothingEnabled = false;
@@ -55,14 +56,13 @@ export function renderBattle(
     ctx.fillRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
   }
 
-  // Overdrive arena pulse tint
   if (engine.overdrive) {
     const pulse = 0.06 + Math.sin(engine.elapsed * 6) * 0.04;
     ctx.fillStyle = `rgba(244, 63, 94, ${pulse})`;
     ctx.fillRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
   }
 
-  // 2. Telegraphed Arena Hazards (Lightning/Meteor warning zones)
+  // 2. Telegraphed Arena Hazards
   for (const hz of engine.hazards) {
     const progress = Math.min(1, hz.age / hz.delay);
     ctx.save();
@@ -79,7 +79,6 @@ export function renderBattle(
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Shrinking impact ring
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -104,20 +103,17 @@ export function renderBattle(
     const label = orb.kind === 'energy' ? '⚡' : orb.kind === 'heal' ? '✚' : '🔥';
 
     ctx.save();
-    // Ground glow
     ctx.fillStyle = 'rgba(0,0,0,0.35)';
     ctx.beginPath();
     ctx.ellipse(orb.x, orb.y + 8, 20, 8, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Pulsing outer ring
     ctx.strokeStyle = color;
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(orb.x, orb.y - 16 + bob, 18 + Math.sin(orb.age * 7) * 3, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Orb body
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(orb.x, orb.y - 16 + bob, 13, 0, Math.PI * 2);
@@ -130,9 +126,14 @@ export function renderBattle(
     ctx.restore();
   }
 
-  // 4. Ground VFX (rings, heals, dash ghosts)
+  // 4. Ground VFX (rings, heals, dash ghosts, spinning rune circles)
   for (const v of engine.vfx) {
-    if (v.type === 'ring' || v.type === 'heal' || v.type === 'dash_ghost') {
+    if (
+      v.type === 'ring' ||
+      v.type === 'heal' ||
+      v.type === 'dash_ghost' ||
+      v.type === 'rune_circle'
+    ) {
       const t = v.age / v.duration;
       ctx.save();
       ctx.globalAlpha = Math.max(0, 1 - t);
@@ -141,6 +142,26 @@ export function renderBattle(
         ctx.beginPath();
         ctx.ellipse(v.x, v.y - 24, 20 * (1 - t * 0.4), 30 * (1 - t * 0.3), 0, 0, Math.PI * 2);
         ctx.fill();
+      } else if (v.type === 'rune_circle') {
+        ctx.translate(v.x, v.y);
+        ctx.scale(1, 0.5);
+        ctx.rotate(v.age * 4);
+        ctx.strokeStyle = v.color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, v.radius * (0.6 + t * 0.5), 0, Math.PI * 2);
+        ctx.stroke();
+        // Inner inscribed diamond rune
+        const r = v.radius * (0.55 + t * 0.45);
+        ctx.strokeStyle = v.secondaryColor ?? '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(r, 0);
+        ctx.lineTo(0, r);
+        ctx.lineTo(-r, 0);
+        ctx.lineTo(0, -r);
+        ctx.closePath();
+        ctx.stroke();
       } else {
         ctx.strokeStyle = v.color;
         ctx.lineWidth = v.type === 'heal' ? 5 : 3.5;
@@ -169,111 +190,114 @@ export function renderBattle(
   const sortedHeroes = [...engine.heroes].sort((a, b) => a.y - b.y);
   for (const h of sortedHeroes) {
     if (h.deathAlpha <= 0.02) continue;
-    drawHero(ctx, h, assets);
+    drawHero(ctx, h, assets, showOverheadBars);
   }
 
-  // 6. Projectiles
+  // 6. Real Animated Weapon & Spell Projectiles
   for (const p of engine.projectiles) {
-    ctx.save();
-    for (let i = 0; i < p.trail.length; i++) {
-      const tp = p.trail[i];
-      const alpha = ((i + 1) / (p.trail.length + 1)) * 0.6;
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = alpha;
-      const sz = p.radius * 1.15 * ((i + 1) / p.trail.length);
-      ctx.fillRect(
-        Math.round(tp.x - sz / 2),
-        Math.round(tp.y - sz / 2),
-        Math.round(sz),
-        Math.round(sz)
-      );
-    }
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = p.secondaryColor;
-    ctx.fillRect(
-      Math.round(p.x - p.radius * 0.45),
-      Math.round(p.y - p.radius * 0.45),
-      Math.round(p.radius * 0.9),
-      Math.round(p.radius * 0.9)
-    );
-    ctx.restore();
+    drawProjectile(ctx, p);
   }
 
-  // 7. Foreground VFX (slashes, explosions, clashes, lightning)
+  // 7. Foreground VFX (slashes, cross_slash, explosions, clashes, lightning, muzzle)
   for (const v of engine.vfx) {
-    if (
-      v.type === 'slash' ||
-      v.type === 'explosion' ||
-      v.type === 'clash' ||
-      v.type === 'lightning'
-    ) {
-      const t = v.age / v.duration;
+    const t = v.age / v.duration;
+    if (v.type === 'slash' || v.type === 'cross_slash') {
       ctx.save();
       ctx.globalAlpha = Math.max(0, 1 - t);
-      if (v.type === 'slash') {
-        ctx.translate(v.x, v.y);
-        ctx.rotate(v.angle ?? 0);
+      ctx.translate(v.x, v.y);
+      ctx.rotate(v.angle ?? 0);
+
+      const drawArc = (rotOffset: number, radScale: number) => {
+        ctx.save();
+        ctx.rotate(rotOffset);
         ctx.strokeStyle = v.color;
         ctx.lineWidth = 12 * (1 - t * 0.5);
         ctx.beginPath();
-        ctx.arc(0, 0, v.radius * (0.75 + t * 0.35), -1.1, 1.1);
+        ctx.arc(0, 0, v.radius * radScale * (0.75 + t * 0.35), -1.15, 1.15);
         ctx.stroke();
 
         ctx.strokeStyle = v.secondaryColor ?? '#ffffff';
         ctx.lineWidth = 5 * (1 - t * 0.5);
         ctx.beginPath();
-        ctx.arc(0, 0, v.radius * (0.78 + t * 0.35), -0.9, 0.9);
+        ctx.arc(0, 0, v.radius * radScale * (0.78 + t * 0.35), -0.9, 0.9);
         ctx.stroke();
-      } else if (v.type === 'explosion') {
-        const r = v.radius * (0.35 + t * 0.78);
-        ctx.fillStyle = v.color;
-        ctx.globalAlpha = (1 - t) * 0.45;
-        ctx.beginPath();
-        ctx.arc(v.x, v.y, r, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.restore();
+      };
 
-        ctx.globalAlpha = 1 - t;
-        ctx.strokeStyle = v.secondaryColor ?? '#ffffff';
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.arc(v.x, v.y, r, 0, Math.PI * 2);
-        ctx.stroke();
-      } else if (v.type === 'clash') {
-        // 8-point anime star clash burst
-        const r = v.radius * (0.4 + t * 0.9);
-        ctx.translate(v.x, v.y);
-        ctx.rotate(t * 2);
-        for (let k = 0; k < 8; k++) {
-          ctx.rotate(Math.PI / 4);
-          ctx.strokeStyle = k % 2 === 0 ? v.color : v.secondaryColor ?? '#ffffff';
-          ctx.lineWidth = 4 * (1 - t);
-          ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.lineTo(r, 0);
-          ctx.stroke();
-        }
-      } else if (v.type === 'lightning') {
-        // Jagged sky-to-ground anime thunderbolt
-        ctx.strokeStyle = v.color;
-        ctx.lineWidth = 9 * (1 - t * 0.6);
-        ctx.beginPath();
-        ctx.moveTo(v.x, 0);
-        const segs = 8;
-        for (let s = 1; s <= segs; s++) {
-          const py = (v.y * s) / segs;
-          const jitter = s === segs ? 0 : (Math.sin(s * 12 + v.age * 40) * 24);
-          ctx.lineTo(v.x + jitter, py);
-        }
-        ctx.stroke();
+      drawArc(0, 1);
+      if (v.type === 'cross_slash') {
+        drawArc(Math.PI * 0.42, 0.88);
+      }
+      ctx.restore();
+    } else if (v.type === 'muzzle') {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, 1 - t);
+      ctx.translate(v.x, v.y);
+      ctx.rotate(v.angle ?? 0);
+      const r = v.radius * (0.5 + t * 0.8);
+      ctx.fillStyle = v.color;
+      ctx.beginPath();
+      ctx.moveTo(r * 1.4, 0);
+      ctx.lineTo(0, -r * 0.55);
+      ctx.lineTo(-r * 0.3, 0);
+      ctx.lineTo(0, r * 0.55);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(r * 0.25, 0, r * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    } else if (v.type === 'explosion') {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, 1 - t);
+      const r = v.radius * (0.35 + t * 0.78);
+      ctx.fillStyle = v.color;
+      ctx.globalAlpha = (1 - t) * 0.45;
+      ctx.beginPath();
+      ctx.arc(v.x, v.y, r, 0, Math.PI * 2);
+      ctx.fill();
 
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 3;
+      ctx.globalAlpha = 1 - t;
+      ctx.strokeStyle = v.secondaryColor ?? '#ffffff';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(v.x, v.y, r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    } else if (v.type === 'clash') {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, 1 - t);
+      const r = v.radius * (0.4 + t * 0.9);
+      ctx.translate(v.x, v.y);
+      ctx.rotate(t * 2);
+      for (let k = 0; k < 8; k++) {
+        ctx.rotate(Math.PI / 4);
+        ctx.strokeStyle = k % 2 === 0 ? v.color : v.secondaryColor ?? '#ffffff';
+        ctx.lineWidth = 4 * (1 - t);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(r, 0);
         ctx.stroke();
       }
+      ctx.restore();
+    } else if (v.type === 'lightning') {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, 1 - t);
+      ctx.strokeStyle = v.color;
+      ctx.lineWidth = 9 * (1 - t * 0.6);
+      ctx.beginPath();
+      ctx.moveTo(v.x, 0);
+      const segs = 8;
+      for (let s = 1; s <= segs; s++) {
+        const py = (v.y * s) / segs;
+        const jitter = s === segs ? 0 : Math.sin(s * 12 + v.age * 40) * 24;
+        ctx.lineTo(v.x + jitter, py);
+      }
+      ctx.stroke();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.stroke();
       ctx.restore();
     }
   }
@@ -312,7 +336,7 @@ export function renderBattle(
   // 11. Screen Flash
   if (engine.screenFlash > 0.01) {
     ctx.save();
-    ctx.globalAlpha = engine.screenFlash * 0.45;
+    ctx.globalAlpha = engine.screenFlash * 0.42;
     ctx.fillStyle = engine.screenFlashColor;
     ctx.fillRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
     ctx.restore();
@@ -324,9 +348,8 @@ export function renderBattle(
     const t = c.age / c.duration;
     const slide = t < 0.14 ? t / 0.14 : t > 0.8 ? (1 - t) / 0.2 : 1;
 
-    // Radial anime speedlines along outer edges
     ctx.save();
-    ctx.globalAlpha = slide * 0.45;
+    ctx.globalAlpha = slide * 0.42;
     ctx.strokeStyle = c.color;
     ctx.lineWidth = 3;
     const cx = ARENA_WIDTH / 2;
@@ -340,30 +363,30 @@ export function renderBattle(
     }
     ctx.restore();
 
-    const bannerY = 86;
+    const bannerY = 92;
     ctx.save();
     ctx.globalAlpha = Math.min(1, slide * 1.1);
     ctx.fillStyle = 'rgba(9, 11, 24, 0.9)';
-    ctx.fillRect(0, bannerY, ARENA_WIDTH, 62);
+    ctx.fillRect(0, bannerY, ARENA_WIDTH, 60);
     ctx.fillStyle = c.color;
     ctx.fillRect(0, bannerY, ARENA_WIDTH, 4);
-    ctx.fillRect(0, bannerY + 58, ARENA_WIDTH, 4);
+    ctx.fillRect(0, bannerY + 56, ARENA_WIDTH, 4);
 
     ctx.textAlign = 'center';
-    ctx.font = 'bold 14px "Courier New", monospace';
+    ctx.font = 'bold 13px "Courier New", monospace';
     ctx.fillStyle = c.side === 'player' ? '#38bdf8' : '#fb7185';
     ctx.fillText(
       `${c.side === 'player' ? '★ ULTIMATE ALIADO' : '⚡ ULTIMATE INIMIGO'} — ${c.heroName.toUpperCase()}`,
       ARENA_WIDTH / 2,
-      bannerY + 23
+      bannerY + 22
     );
-    ctx.font = '900 26px "Courier New", monospace';
+    ctx.font = '900 24px "Courier New", monospace';
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(c.skillName.toUpperCase(), ARENA_WIDTH / 2, bannerY + 50);
+    ctx.fillText(c.skillName.toUpperCase(), ARENA_WIDTH / 2, bannerY + 48);
     ctx.restore();
   }
 
-  // 13. Arena Event Banner (Orbs / Lightning / Overdrive)
+  // 13. Arena Event Banner
   if (engine.eventBanner && !engine.callout) {
     const eb = engine.eventBanner;
     const t = eb.age / eb.duration;
@@ -371,21 +394,224 @@ export function renderBattle(
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.fillStyle = 'rgba(9, 11, 24, 0.84)';
-    ctx.fillRect(ARENA_WIDTH / 2 - 330, 18, 660, 38);
+    ctx.fillRect(ARENA_WIDTH / 2 - 320, 74, 640, 34);
     ctx.strokeStyle = eb.color;
     ctx.lineWidth = 2;
-    ctx.strokeRect(ARENA_WIDTH / 2 - 330, 18, 660, 38);
-    ctx.font = '900 15px "Courier New", monospace';
+    ctx.strokeRect(ARENA_WIDTH / 2 - 320, 74, 640, 34);
+    ctx.font = '900 14px "Courier New", monospace';
     ctx.textAlign = 'center';
     ctx.fillStyle = eb.color;
-    ctx.fillText(eb.text, ARENA_WIDTH / 2, 42);
+    ctx.fillText(eb.text, ARENA_WIDTH / 2, 96);
     ctx.restore();
   }
 
   ctx.restore();
 }
 
-function drawHero(ctx: CanvasRenderingContext2D, h: HeroRuntime, assets: LoadedAssets): void {
+function drawProjectile(ctx: CanvasRenderingContext2D, p: Projectile): void {
+  const angle = Math.atan2(p.vy, p.vx);
+
+  // Motion trail ribbon
+  if (p.trail.length > 1) {
+    ctx.save();
+    for (let i = 1; i < p.trail.length; i++) {
+      const a = p.trail[i - 1];
+      const b = p.trail[i];
+      const ratio = i / p.trail.length;
+      ctx.strokeStyle = p.color;
+      ctx.globalAlpha = ratio * 0.55;
+      ctx.lineWidth = Math.max(2, p.radius * 0.65 * ratio);
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  ctx.rotate(angle);
+
+  switch (p.style) {
+    case 'arrow': {
+      // Glowing energy arrow: long shaft + sharp triangular arrowhead + twin fletching feathers!
+      const len = p.radius * 2.5;
+      // Outer glow shaft
+      ctx.strokeStyle = p.color;
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(-len, 0);
+      ctx.lineTo(len * 0.6, 0);
+      ctx.stroke();
+      // White core shaft
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(-len * 0.95, 0);
+      ctx.lineTo(len * 0.7, 0);
+      ctx.stroke();
+      // Arrowhead
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.moveTo(len * 1.15, 0);
+      ctx.lineTo(len * 0.3, -8);
+      ctx.lineTo(len * 0.45, 0);
+      ctx.lineTo(len * 0.3, 8);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(len * 0.95, 0);
+      ctx.lineTo(len * 0.45, -3.5);
+      ctx.lineTo(len * 0.45, 3.5);
+      ctx.closePath();
+      ctx.fill();
+      // Fletching feathers at tail
+      ctx.strokeStyle = p.secondaryColor;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(-len * 0.7, 0);
+      ctx.lineTo(-len * 1.15, -6);
+      ctx.moveTo(-len * 0.7, 0);
+      ctx.lineTo(-len * 1.15, 6);
+      ctx.stroke();
+      break;
+    }
+
+    case 'shuriken': {
+      // Rapidly spinning 4-point ninja star!
+      ctx.rotate(p.life * 24);
+      const r = p.radius * 1.25;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      for (let i = 0; i < 4; i++) {
+        const a = (i * Math.PI) / 2;
+        ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+        ctx.lineTo(Math.cos(a + Math.PI / 4) * (r * 0.35), Math.sin(a + Math.PI / 4) * (r * 0.35));
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = p.secondaryColor;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#090b16';
+      ctx.beginPath();
+      ctx.arc(0, 0, 3, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    }
+
+    case 'blade_wave': {
+      // Anime crescent Getsuga slash wave!
+      const r = p.radius * 2.1;
+      ctx.strokeStyle = p.color;
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.arc(-r * 0.35, 0, r, -0.95, 0.95);
+      ctx.stroke();
+      ctx.strokeStyle = p.secondaryColor;
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.arc(-r * 0.3, 0, r * 0.95, -0.8, 0.8);
+      ctx.stroke();
+      break;
+    }
+
+    case 'laser': {
+      // Elongated high-velocity neon plasma rail-beam!
+      const len = p.radius * 3.0;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-len, -p.radius * 0.45, len * 2, p.radius * 0.9);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(-len * 0.9, -p.radius * 0.2, len * 1.8, p.radius * 0.4);
+      break;
+    }
+
+    case 'ice_lance': {
+      // Sharp crystalline ice spear!
+      const len = p.radius * 2.3;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.moveTo(len, 0);
+      ctx.lineTo(0, -7);
+      ctx.lineTo(-len * 0.85, 0);
+      ctx.lineTo(0, 7);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(len * 0.8, 0);
+      ctx.lineTo(0, -3);
+      ctx.lineTo(-len * 0.5, 0);
+      ctx.lineTo(0, 3);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+
+    case 'fireball': {
+      // Blazing comet fireball with flame tail!
+      const r = p.radius * 1.1;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.moveTo(-r * 2.4, 0);
+      ctx.lineTo(0, -r * 0.95);
+      ctx.arc(0, 0, r * 0.95, -Math.PI / 2, Math.PI / 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = p.secondaryColor;
+      ctx.beginPath();
+      ctx.arc(r * 0.1, 0, r * 0.55, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    }
+
+    case 'soul_flame': {
+      // Wavy spectral soul flame!
+      const r = p.radius * 1.1;
+      const wobble = Math.sin(p.life * 22) * 3;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.moveTo(-r * 2.2, wobble);
+      ctx.quadraticCurveTo(-r * 0.5, -r * 1.1, r, 0);
+      ctx.quadraticCurveTo(-r * 0.5, r * 1.1, -r * 2.2, wobble);
+      ctx.fill();
+      ctx.fillStyle = p.secondaryColor;
+      ctx.beginPath();
+      ctx.arc(r * 0.2, 0, r * 0.45, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    }
+
+    default: {
+      // Arcane / Celestial Orb with rotating diamond ring
+      const r = p.radius;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.rotate(p.life * 10);
+      ctx.strokeStyle = p.secondaryColor;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(-r * 0.8, -r * 0.8, r * 1.6, r * 1.6);
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    }
+  }
+
+  ctx.restore();
+}
+
+function drawHero(
+  ctx: CanvasRenderingContext2D,
+  h: HeroRuntime,
+  assets: LoadedAssets,
+  showOverheadBars: boolean
+): void {
   ctx.save();
   ctx.globalAlpha = h.deathAlpha;
 
@@ -401,7 +627,6 @@ function drawHero(ctx: CanvasRenderingContext2D, h: HeroRuntime, assets: LoadedA
   ctx.ellipse(h.x, h.y + 4, 28, 12, 0, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Awakened persistent golden aura
   if (h.awakened && h.alive) {
     ctx.save();
     ctx.strokeStyle = '#fde047';
@@ -413,7 +638,6 @@ function drawHero(ctx: CanvasRenderingContext2D, h: HeroRuntime, assets: LoadedA
     ctx.restore();
   }
 
-  // Ultimate Aura
   if (h.ultimateAura > 0) {
     ctx.save();
     ctx.strokeStyle = h.def.color;
@@ -425,20 +649,23 @@ function drawHero(ctx: CanvasRenderingContext2D, h: HeroRuntime, assets: LoadedA
     ctx.restore();
   }
 
-  // Procedural Anime Sprite Animation
+  // Expressive Procedural Anime Animation: breathing + walk hop + attack lunge & tilt!
   const isMoving = Math.hypot(h.vx, h.vy) > 6;
-  const bob = isMoving ? Math.abs(Math.sin(h.walkPhase)) * 8 : Math.sin(h.animTime * 4) * 2;
-  const lunge = h.attackAnim > 0 ? Math.sin((h.attackAnim / 0.36) * Math.PI) * 18 * h.facing : 0;
-  const scaleX = (isMoving ? 1 + Math.sin(h.walkPhase * 2) * 0.05 : 1) * h.facing;
+  const bob = isMoving ? Math.abs(Math.sin(h.walkPhase)) * 9 : Math.sin(h.animTime * 4) * 2;
+  const atkProgress = h.attackAnim > 0 ? Math.sin((h.attackAnim / 0.36) * Math.PI) : 0;
+  const lunge = atkProgress * (h.def.basicAttackIsRanged ? -8 : 22) * h.facing;
+  const tilt = atkProgress * (h.def.basicAttackIsRanged ? -0.14 : 0.24) * h.facing;
+  const scaleX = (isMoving ? 1 + Math.sin(h.walkPhase * 2) * 0.05 : 1 + atkProgress * 0.08) * h.facing;
   const scaleY = isMoving
     ? 1 - Math.sin(h.walkPhase * 2) * 0.05
-    : 1 + Math.sin(h.animTime * 4) * 0.03;
+    : 1 + Math.sin(h.animTime * 4) * 0.03 - atkProgress * 0.06;
 
   const sprite = assets.sprites[h.heroId];
   const drawSize = 118;
 
   ctx.save();
   ctx.translate(Math.round(h.x + lunge), Math.round(h.y - bob));
+  ctx.rotate(tilt);
   ctx.scale(scaleX, scaleY);
 
   if (sprite) {
@@ -454,11 +681,10 @@ function drawHero(ctx: CanvasRenderingContext2D, h: HeroRuntime, assets: LoadedA
   }
   ctx.restore();
 
-  // Shield dome visual
   if (h.shield > 0 && h.alive) {
     ctx.save();
     ctx.strokeStyle = 'rgba(96, 165, 250, 0.88)';
-    ctx.fillStyle = 'rgba(96, 165, 250, 0.16)';
+    ctx.fillStyle = 'rgba(96, 165, 250, 0.14)';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.arc(h.x, h.y - 30, 39, 0, Math.PI * 2);
@@ -467,27 +693,20 @@ function drawHero(ctx: CanvasRenderingContext2D, h: HeroRuntime, assets: LoadedA
     ctx.restore();
   }
 
-  // Overhead HP + Shield + Energy Bars
-  if (h.alive) {
-    const bw = 66;
+  // Sleek Optional Overhead Bars
+  if (h.alive && showOverheadBars) {
+    const bw = 60;
     const bx = Math.round(h.x - bw / 2);
     const by = Math.round(h.y - 90);
 
-    ctx.font = 'bold 12px "Courier New", monospace';
-    ctx.textAlign = 'center';
     ctx.fillStyle = '#09090b';
-    ctx.fillText(h.def.name, h.x + 1, by - 4);
-    ctx.fillStyle = h.awakened ? '#fde047' : h.side === 'player' ? '#e0f2fe' : '#fecdd3';
-    ctx.fillText(h.def.name, h.x, by - 5);
-
-    ctx.fillStyle = '#09090b';
-    ctx.fillRect(bx - 1, by - 1, bw + 2, 9);
+    ctx.fillRect(bx - 1, by - 1, bw + 2, 8);
     ctx.fillStyle = '#1e293b';
-    ctx.fillRect(bx, by, bw, 7);
+    ctx.fillRect(bx, by, bw, 6);
 
     const hpRatio = Math.max(0, h.hp / h.maxHp);
     ctx.fillStyle = h.side === 'player' ? '#22c55e' : '#ef4444';
-    ctx.fillRect(bx, by, Math.round(bw * hpRatio), 7);
+    ctx.fillRect(bx, by, Math.round(bw * hpRatio), 6);
 
     if (h.shield > 0) {
       const shRatio = Math.min(1, h.shield / h.maxHp);
@@ -496,9 +715,9 @@ function drawHero(ctx: CanvasRenderingContext2D, h: HeroRuntime, assets: LoadedA
     }
 
     ctx.fillStyle = '#09090b';
-    ctx.fillRect(bx - 1, by + 8, bw + 2, 5);
+    ctx.fillRect(bx - 1, by + 7, bw + 2, 4);
     ctx.fillStyle = h.energy >= 99 ? '#fde047' : '#38bdf8';
-    ctx.fillRect(bx, by + 9, Math.round(bw * (h.energy / 100)), 3);
+    ctx.fillRect(bx, by + 8, Math.round(bw * (h.energy / 100)), 2);
 
     const icons: string[] = [];
     for (const st of h.statuses) {
@@ -510,8 +729,9 @@ function drawHero(ctx: CanvasRenderingContext2D, h: HeroRuntime, assets: LoadedA
     }
     if (icons.length > 0) {
       ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'center';
       ctx.fillStyle = '#fef08a';
-      ctx.fillText(icons.join(' '), h.x, by - 18);
+      ctx.fillText(icons.join(' '), h.x, by - 6);
     }
   }
 

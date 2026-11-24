@@ -5,9 +5,11 @@ import type {
   BattleResult,
   FloatingText,
   FormationSlot,
+  HeroId,
   HeroRuntime,
   Particle,
   Projectile,
+  ProjectileStyle,
   SkillDef,
   TeamMemberConfig,
   TeamSide,
@@ -37,6 +39,58 @@ export function slotToCoords(slot: FormationSlot, side: TeamSide): { x: number; 
     x: side === 'player' ? colMapPlayer[slot.col] : colMapEnemy[slot.col],
     y: rowMap[slot.row],
   };
+}
+
+function resolveProjectileStyle(heroId: HeroId, skill?: SkillDef): ProjectileStyle {
+  if (skill?.projectileStyle) return skill.projectileStyle;
+  if (skill?.id === 'kage_shuriken') return 'shuriken';
+  if (skill?.id === 'ren_wind_wave' || skill?.id === 'ren_ult_tempest') return 'blade_wave';
+  if (skill?.id === 'drake_fire_breath') return 'fireball';
+  if (skill?.id === 'ryuji_shock_palm') return 'blade_wave';
+  if (skill?.id === 'kael_soul_orb') return 'soul_flame';
+  switch (heroId) {
+    case 'sora':
+      return 'arrow';
+    case 'nova':
+      return 'laser';
+    case 'yuki':
+      return 'ice_lance';
+    case 'kage':
+      return 'shuriken';
+    case 'kael':
+      return 'soul_flame';
+    case 'ren':
+    case 'drake':
+      return 'blade_wave';
+    default:
+      return 'orb';
+  }
+}
+
+export interface HudHeroSnapshot {
+  uid: string;
+  heroId: HeroId;
+  name: string;
+  role: string;
+  color: string;
+  spritePath: string;
+  side: TeamSide;
+  hp: number;
+  maxHp: number;
+  shield: number;
+  energy: number;
+  alive: boolean;
+  awakened: boolean;
+  statuses: Array<'burn' | 'stun' | 'slow' | 'atkBuff' | 'taunt'>;
+}
+
+export interface HudSnapshot {
+  elapsed: number;
+  overdrive: boolean;
+  playerHpPct: number;
+  enemyHpPct: number;
+  playerHeroes: HudHeroSnapshot[];
+  enemyHeroes: HudHeroSnapshot[];
 }
 
 export class BattleEngine {
@@ -159,12 +213,8 @@ export class BattleEngine {
       if (this.eventBanner.age >= this.eventBanner.duration) this.eventBanner = null;
     }
 
-    if (this.hitstop > 0) {
-      this.hitstop = Math.max(0, this.hitstop - dt);
-      this.updateVisualsOnly(dt * 0.25);
-      return;
-    }
-
+    // No hitstop freeze — continuous fluid 60fps anime action!
+    this.hitstop = 0;
     this.elapsed += dt;
 
     // Activate Overdrive at 30s for dramatic late-game comebacks!
@@ -666,15 +716,30 @@ export class BattleEngine {
       sound.playShoot();
       const angle = Math.atan2(target.y - h.y, target.x - h.x);
       const speed = (h.def.basicProjectileSpeed ?? 420) * 1.15;
+      const sx = h.x + h.facing * 26;
+      const sy = h.y - 30;
+      this.vfx.push({
+        id: uid('vfx'),
+        type: 'muzzle',
+        x: sx,
+        y: sy,
+        angle,
+        radius: 22,
+        color: h.def.basicAttackColor,
+        secondaryColor: '#ffffff',
+        age: 0,
+        duration: 0.16,
+      });
       this.projectiles.push({
         id: uid('proj'),
         side: h.side,
         sourceUid: h.uid,
-        x: h.x + h.facing * 22,
-        y: h.y - 26,
+        style: resolveProjectileStyle(h.heroId),
+        x: sx,
+        y: sy,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        radius: 10,
+        radius: 11,
         color: h.def.basicAttackColor,
         secondaryColor: '#ffffff',
         damage: raw,
@@ -690,11 +755,11 @@ export class BattleEngine {
       const angle = Math.atan2(target.y - h.y, target.x - h.x);
       this.vfx.push({
         id: uid('vfx'),
-        type: 'slash',
-        x: h.x + Math.cos(angle) * 28,
-        y: h.y - 26 + Math.sin(angle) * 16,
+        type: crit ? 'cross_slash' : 'slash',
+        x: h.x + Math.cos(angle) * 32,
+        y: h.y - 28 + Math.sin(angle) * 18,
         angle,
-        radius: 44,
+        radius: crit ? 52 : 46,
         color: h.def.basicAttackColor,
         secondaryColor: '#ffffff',
         age: 0,
@@ -846,6 +911,21 @@ export class BattleEngine {
         const baseAngle = Math.atan2(target.y - h.y, target.x - h.x);
         const spread = count === 5 ? 0.16 : 0.21;
         const speed = (skill.projectileSpeed ?? 460) * 1.15;
+        const style = resolveProjectileStyle(h.heroId, skill);
+        const sx = h.x + h.facing * 26;
+        const sy = h.y - 30;
+        this.vfx.push({
+          id: uid('vfx'),
+          type: 'muzzle',
+          x: sx,
+          y: sy,
+          angle: baseAngle,
+          radius: skill.isUltimate ? 34 : 26,
+          color: skill.color,
+          secondaryColor: skill.secondaryColor ?? '#ffffff',
+          age: 0,
+          duration: 0.2,
+        });
         for (let i = 0; i < count; i++) {
           const offset = (i - (count - 1) / 2) * spread;
           const a = baseAngle + offset;
@@ -854,8 +934,9 @@ export class BattleEngine {
             id: uid('proj'),
             side: h.side,
             sourceUid: h.uid,
-            x: h.x + h.facing * 22,
-            y: h.y - 26,
+            style,
+            x: sx,
+            y: sy,
             vx: Math.cos(a) * speed,
             vy: Math.sin(a) * speed,
             radius: skill.isUltimate ? 16 : 12,
@@ -863,7 +944,7 @@ export class BattleEngine {
             secondaryColor: skill.secondaryColor ?? '#ffffff',
             damage: atk * skill.power * (crit ? 1.45 : 1),
             crit,
-            pierce: skill.isUltimate || skill.id === 'sora_pierce',
+            pierce: skill.isUltimate || skill.id === 'sora_pierce' || skill.id === 'nova_railgun',
             hitUids: new Set(),
             life: 0,
             maxLife: 2.1,
@@ -880,6 +961,17 @@ export class BattleEngine {
         const cx = skill.kind === 'aoe_self' ? h.x : target.x;
         const cy = skill.kind === 'aoe_self' ? h.y : target.y;
         const radius = (skill.radius ?? 105) * 1.15;
+        this.vfx.push({
+          id: uid('vfx'),
+          type: 'rune_circle',
+          x: h.x,
+          y: h.y + 4,
+          radius: 44,
+          color: skill.color,
+          secondaryColor: skill.secondaryColor,
+          age: 0,
+          duration: 0.45,
+        });
         if (skill.id === 'lyra_thunder_strike' || skill.id === 'sora_ult_starfall') {
           this.vfx.push({
             id: uid('vfx'),
@@ -1301,6 +1393,42 @@ export class BattleEngine {
       age: 0,
       duration: 0.9,
     });
+  }
+
+  getHudSnapshot(): HudSnapshot {
+    const mapHero = (h: HeroRuntime): HudHeroSnapshot => ({
+      uid: h.uid,
+      heroId: h.heroId,
+      name: h.def.name,
+      role: h.def.role,
+      color: h.def.color,
+      spritePath: h.def.spritePath,
+      side: h.side,
+      hp: h.hp,
+      maxHp: h.maxHp,
+      shield: h.shield,
+      energy: h.energy,
+      alive: h.alive,
+      awakened: h.awakened,
+      statuses: Array.from(new Set(h.statuses.map((s) => s.type))),
+    });
+
+    const playerHeroes = this.heroes.filter((h) => h.side === 'player').map(mapHero);
+    const enemyHeroes = this.heroes.filter((h) => h.side === 'enemy').map(mapHero);
+
+    const pCur = playerHeroes.reduce((a, h) => a + h.hp, 0);
+    const pMax = Math.max(1, playerHeroes.reduce((a, h) => a + h.maxHp, 0));
+    const eCur = enemyHeroes.reduce((a, h) => a + h.hp, 0);
+    const eMax = Math.max(1, enemyHeroes.reduce((a, h) => a + h.maxHp, 0));
+
+    return {
+      elapsed: this.elapsed,
+      overdrive: this.overdrive,
+      playerHpPct: Math.round((pCur / pMax) * 100),
+      enemyHpPct: Math.round((eCur / eMax) * 100),
+      playerHeroes,
+      enemyHeroes,
+    };
   }
 
   private checkVictory(): void {

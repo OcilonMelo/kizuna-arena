@@ -45,6 +45,16 @@ export type SkillKind =
   | 'blink_backline'
   | 'buff_team';
 
+export type ProjectileStyle =
+  | 'arrow'
+  | 'shuriken'
+  | 'blade_wave'
+  | 'laser'
+  | 'ice_lance'
+  | 'fireball'
+  | 'soul_flame'
+  | 'orb';
+
 export interface SkillDef {
   id: string;
   name: string;
@@ -57,6 +67,7 @@ export interface SkillDef {
   radius?: number; // for AoE or arc radius
   projectileSpeed?: number;
   projectileCount?: number;
+  projectileStyle?: ProjectileStyle;
   color: string;
   secondaryColor?: string;
   statusEffect?: {
@@ -88,6 +99,7 @@ export interface HeroDef {
   basicAttackColor: string;
   basicAttackIsRanged: boolean;
   basicProjectileSpeed?: number;
+  basicProjectileStyle?: ProjectileStyle;
   activeSkills: SkillDef[]; // 4 options, player picks 2
   ultimates: SkillDef[]; // 2 options, player picks 1
   defaultActiveIds: [string, string];
@@ -167,6 +179,7 @@ export interface Projectile {
   id: string;
   side: TeamSide;
   sourceUid: string;
+  style: ProjectileStyle;
   x: number;
   y: number;
   vx: number;
@@ -187,7 +200,19 @@ export interface Projectile {
 
 export interface VfxEffect {
   id: string;
-  type: 'slash' | 'ring' | 'explosion' | 'heal' | 'dash_ghost' | 'beam' | 'spark' | 'clash' | 'lightning';
+  type:
+    | 'slash'
+    | 'cross_slash'
+    | 'ring'
+    | 'explosion'
+    | 'heal'
+    | 'dash_ghost'
+    | 'beam'
+    | 'spark'
+    | 'clash'
+    | 'lightning'
+    | 'muzzle'
+    | 'rune_circle';
   x: number;
   y: number;
   targetX?: number;
