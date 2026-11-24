@@ -8,6 +8,130 @@ SPRITE_DIR = os.path.join(OUT_DIR, "sprites")
 os.makedirs(SPRITE_DIR, exist_ok=True)
 
 
+def clamp(v: int) -> int:
+    return 0 if v < 0 else 255 if v > 255 else v
+
+
+def tint_color(c, factor: float):
+    r, g, b, a = c
+    if a == 0:
+        return (0, 0, 0, 0)
+    return (clamp(int(r * factor)), clamp(int(g * factor)), clamp(int(b * factor)), a)
+
+
+def scale2x_epx(img: Image.Image) -> Image.Image:
+    """Classic pixel-art EPX / Scale2x algorithm: doubles resolution cleanly while beveling diagonal edges."""
+    w, h = img.size
+    src = img.load()
+    out = Image.new("RGBA", (w * 2, h * 2), (0, 0, 0, 0))
+    dst = out.load()
+
+    for y in range(h):
+        for x in range(w):
+            P = src[x, y]
+            A = src[x, y - 1] if y > 0 else (0, 0, 0, 0)
+            B = src[x + 1, y] if x < w - 1 else (0, 0, 0, 0)
+            C = src[x - 1, y] if x > 0 else (0, 0, 0, 0)
+            D = src[x, y + 1] if y < h - 1 else (0, 0, 0, 0)
+
+            p1 = A if (C == A and C != D and A != B) else P
+            p2 = B if (A == B and A != C and B != D) else P
+            p3 = C if (D == C and D != B and C != A) else P
+            p4 = D if (B == D and B != A and D != C) else P
+
+            dst[x * 2, y * 2] = p1
+            dst[x * 2 + 1, y * 2] = p2
+            dst[x * 2, y * 2 + 1] = p3
+            dst[x * 2 + 1, y * 2 + 1] = p4
+    return out
+
+
+def enhance_pixel_art_128(raw_64: Image.Image) -> Image.Image:
+    """
+    Upgrades a 64x64 sprite into true 128x128 32-bit HD pixel art:
+    1. Strip any flat outline, apply EPX/Scale2x to 128x128 for organic beveled pixel curves.
+    2. Apply 3-tone directional pixel shading (top-right rim highlight, bottom-left shadow)
+       + subtle Bayer 2x2 dithering on shaded bands.
+    3. Apply selective dark internal shading lines (sel-out) between contrasting color regions.
+    4. Finish with a crisp 1px dark exterior pixel outline.
+    """
+    # Step 1: Remove exterior dark outline if present so EPX smooths actual body shapes cleanly
+    w0, h0 = raw_64.size
+    cleaned = raw_64.copy()
+    cpx = cleaned.load()
+    for y in range(h0):
+        for x in range(w0):
+            if cpx[x, y] == (14, 10, 24, 255):
+                cpx[x, y] = (0, 0, 0, 0)
+
+    # Step 2: Double resolution 64x64 -> 128x128 with EPX pixel-art curve beveling
+    hi = scale2x_epx(cleaned)
+    w, h = hi.size
+    src = hi.load()
+    shaded = hi.copy()
+    dst = shaded.load()
+
+    def color_dist(c1, c2):
+        return abs(c1[0] - c2[0]) + abs(c1[1] - c2[1]) + abs(c1[2] - c2[2])
+
+    for y in range(h):
+        for x in range(w):
+            p = src[x, y]
+            if p[3] == 0:
+                continue
+
+            up = src[x, y - 1] if y > 0 else (0, 0, 0, 0)
+            down = src[x, y + 1] if y < h - 1 else (0, 0, 0, 0)
+            left = src[x - 1, y] if x > 0 else (0, 0, 0, 0)
+            right = src[x + 1, y] if x < w - 1 else (0, 0, 0, 0)
+
+            # Skip pure white highlights / glowing cores
+            luma = (p[0] * 299 + p[1] * 587 + p[2] * 114) / 1000
+            if luma > 242:
+                continue
+
+            # Directional Rim Highlight (top & right edges exposed to light)
+            if up[3] == 0 or (right[3] == 0 and y < h * 0.72):
+                dst[x, y] = tint_color(p, 1.22)
+            # Directional Bottom/Left Shadow with subtle 2x2 Bayer pixel dithering
+            elif down[3] == 0 or left[3] == 0:
+                dst[x, y] = tint_color(p, 0.74)
+            else:
+                # Internal boundary selective shading (separates clothing/armor/hair/weapons cleanly!)
+                diff_down = color_dist(p, down) if down[3] > 0 else 0
+                diff_left = color_dist(p, left) if left[3] > 0 else 0
+                if diff_down > 95 or diff_left > 95:
+                    dst[x, y] = tint_color(p, 0.78)
+                elif (x + y) % 2 == 0:
+                    # Subtle 2nd-pixel inner bevel highlight/shadow for 32-bit richness
+                    up2 = src[x, y - 2] if y > 1 else (0, 0, 0, 0)
+                    down2 = src[x, y + 2] if y < h - 2 else (0, 0, 0, 0)
+                    if up2[3] == 0:
+                        dst[x, y] = tint_color(p, 1.1)
+                    elif down2[3] == 0:
+                        dst[x, y] = tint_color(p, 0.88)
+
+    # Step 3: Crisp 1px selective dark exterior outline at 128x128
+    out = shaded.copy()
+    opx = out.load()
+    spx = shaded.load()
+    for y in range(h):
+        for x in range(w):
+            if spx[x, y][3] == 0:
+                neighbors = []
+                for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < w and 0 <= ny < h and spx[nx, ny][3] > 0:
+                        neighbors.append(spx[nx, ny])
+                if neighbors:
+                    # Colored dark sel-out (tinted dark version of adjacent pixel — pro pixel art look!)
+                    nr = sum(n[0] for n in neighbors) // len(neighbors)
+                    ng = sum(n[1] for n in neighbors) // len(neighbors)
+                    nb = sum(n[2] for n in neighbors) // len(neighbors)
+                    opx[x, y] = (max(10, int(nr * 0.22)), max(8, int(ng * 0.2)), max(18, int(nb * 0.26)), 255)
+    return out
+
+
 def add_outline(img: Image.Image, outline_color=(14, 10, 24, 255)) -> Image.Image:
     w, h = img.size
     src = img.load()
@@ -1606,12 +1730,13 @@ def main():
         "seraph": make_seraph,
     }
     for name, fn in makers.items():
-        sprite = fn()
-        # Scale 3x crisp nearest-neighbor -> 192x192
-        scaled = sprite.resize((192, 192), Image.Resampling.NEAREST)
+        sprite_64 = fn()
+        # Upgrade to crisp 128x128 HD pixel art (EPX + 3-tone lighting + sel-out) -> scale 2x to 256x256
+        sprite_128 = enhance_pixel_art_128(sprite_64)
+        scaled = sprite_128.resize((256, 256), Image.Resampling.NEAREST)
         out_path = os.path.join(SPRITE_DIR, f"{name}.png")
         scaled.save(out_path)
-        print("Saved:", out_path)
+        print("Saved 128x128 HD:", out_path)
 
     arena = make_arena_bg()
     arena_path = os.path.join(OUT_DIR, "arena_bg.png")
