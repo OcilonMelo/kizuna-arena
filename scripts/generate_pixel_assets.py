@@ -360,48 +360,54 @@ def make_lyra():
 
 
 def make_bram():
-    """Bram — Baluarte Dourado (64x64 towering armored paladin with kite shield & warhammer)"""
+    """Bram — Baluarte Dourado (64x64 towering armored paladin with clear raised warhammer & kite shield)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    # Heavy Celestial Warhammer behind left shoulder
-    d.line([(17, 16), (25, 42)], fill=(120, 53, 15, 255), width=3)
-    rect(d, 8, 9, 24, 19, (148, 163, 184, 255))
-    rect(d, 10, 10, 22, 16, (226, 232, 240, 255))
-    rect(d, 8, 9, 11, 19, (250, 204, 21, 255))
-    rect(d, 21, 9, 24, 19, (250, 204, 21, 255))
-    rect(d, 14, 12, 18, 16, (56, 189, 248, 255))
+    # Royal blue paladin cape with gold trim flowing behind
+    poly(d, [(21, 29), (12, 52), (24, 54), (30, 35)], (30, 58, 138, 255))
+    poly(d, [(22, 30), (15, 50), (23, 52), (29, 35)], (37, 99, 235, 255))
+    d.line([(13, 51), (23, 53)], fill=(250, 204, 21, 255), width=2)
 
-    # Royal blue paladin cape with gold trim
-    poly(d, [(20, 27), (10, 51), (22, 53), (28, 34)], (30, 58, 138, 255))
-    poly(d, [(21, 28), (13, 49), (21, 51), (27, 34)], (37, 99, 235, 255))
-    d.line([(11, 50), (21, 52)], fill=(250, 204, 21, 255), width=2)
+    # Clearly separated Back Arm holding a tall Glowing Golden Warhammer UP & LEFT (far from helmet!)
+    rect(d, 10, 31, 18, 35, (203, 213, 225, 255))  # armored arm
+    rect(d, 9, 30, 13, 35, (234, 179, 8, 255))     # gauntlet gripping handle
+    # Long wooden/steel hammer shaft vertical on the left
+    rect(d, 10, 14, 12, 43, (120, 53, 15, 255))
+    rect(d, 11, 14, 12, 43, (161, 98, 7, 255))
+    rect(d, 10, 42, 12, 44, (250, 204, 21, 255))   # pommel
+    # Massive unmistakable Warhammer Head clearly above the handle
+    rect(d, 4, 8, 18, 16, (148, 163, 184, 255))
+    rect(d, 6, 9, 16, 14, (226, 232, 240, 255))
+    rect(d, 4, 8, 7, 16, (250, 204, 21, 255))      # gold striking face L
+    rect(d, 15, 8, 18, 16, (250, 204, 21, 255))    # gold striking face R
+    rect(d, 9, 10, 13, 14, (56, 189, 248, 255))    # glowing rune gem
 
     # Armored Greaves / Legs
-    rect(d, 20, 44, 27, 58, (148, 163, 184, 255))
-    rect(d, 21, 45, 25, 55, (203, 213, 225, 255))
-    rect(d, 19, 55, 28, 59, (202, 138, 4, 255))
+    rect(d, 22, 45, 29, 58, (148, 163, 184, 255))
+    rect(d, 23, 46, 27, 55, (203, 213, 225, 255))
+    rect(d, 21, 55, 30, 59, (202, 138, 4, 255))
 
-    rect(d, 30, 44, 38, 58, (148, 163, 184, 255))
-    rect(d, 32, 45, 36, 55, (226, 232, 240, 255))
-    rect(d, 30, 55, 40, 59, (234, 179, 8, 255))
+    rect(d, 32, 45, 39, 58, (148, 163, 184, 255))
+    rect(d, 33, 46, 37, 55, (226, 232, 240, 255))
+    rect(d, 32, 55, 41, 59, (234, 179, 8, 255))
 
     # Broad Metallic Breastplate + Royal Blue Tabard
-    rect(d, 18, 27, 39, 45, (148, 163, 184, 255))
-    rect(d, 20, 28, 37, 42, (226, 232, 240, 255))
-    rect(d, 25, 31, 33, 45, (37, 99, 235, 255))
-    rect(d, 28, 32, 30, 44, (250, 204, 21, 255))
-    rect(d, 18, 41, 39, 44, (202, 138, 4, 255))
+    rect(d, 20, 28, 39, 45, (148, 163, 184, 255))
+    rect(d, 22, 29, 37, 42, (226, 232, 240, 255))
+    rect(d, 26, 31, 34, 45, (37, 99, 235, 255))
+    rect(d, 29, 32, 31, 44, (250, 204, 21, 255))
+    rect(d, 20, 41, 39, 44, (202, 138, 4, 255))
 
-    # Huge Sculpted Golden Pauldrons
-    poly(d, [(14, 26), (24, 25), (24, 34), (14, 33)], (234, 179, 8, 255))
-    rect(d, 16, 27, 23, 30, (254, 240, 138, 255))
-    poly(d, [(33, 25), (43, 26), (42, 34), (33, 34)], (234, 179, 8, 255))
-    rect(d, 34, 27, 41, 30, (254, 240, 138, 255))
+    # Sculpted Golden Pauldrons
+    poly(d, [(17, 27), (25, 26), (25, 34), (17, 33)], (234, 179, 8, 255))
+    rect(d, 18, 28, 24, 30, (254, 240, 138, 255))
+    poly(d, [(34, 26), (42, 27), (41, 34), (34, 34)], (234, 179, 8, 255))
+    rect(d, 35, 28, 40, 30, (254, 240, 138, 255))
 
-    # Head with heroic blond hair + winged silver-gold knight helm
+    # Head with heroic blond hair + winged silver-gold knight helm (clean separation!)
     draw_anime_head(
-        d, 29, 18,
+        d, 30, 19,
         skin=(248, 214, 184, 255),
         skin_sh=(218, 172, 138, 255),
         eye_main=(59, 130, 246, 255),
@@ -410,20 +416,18 @@ def make_bram():
         hair_sh=(161, 98, 7, 255),
         hair_hi=(254, 240, 138, 255),
     )
-    # Helmet crown + blue plume
-    rect(d, 20, 9, 37, 15, (203, 213, 225, 255))
-    rect(d, 22, 10, 35, 13, (241, 245, 249, 255))
-    rect(d, 20, 14, 37, 15, (250, 204, 21, 255))
-    poly(d, [(25, 9), (32, 9), (26, 3), (18, 6)], (37, 99, 235, 255))
-    poly(d, [(26, 8), (30, 8), (26, 4)], (96, 165, 250, 255))
+    rect(d, 22, 10, 38, 16, (203, 213, 225, 255))
+    rect(d, 24, 11, 36, 14, (241, 245, 249, 255))
+    rect(d, 22, 15, 38, 16, (250, 204, 21, 255))
+    poly(d, [(27, 10), (33, 10), (28, 4), (21, 7)], (37, 99, 235, 255))
+    poly(d, [(28, 9), (31, 9), (28, 5)], (96, 165, 250, 255))
 
-    # Massive Ornate Tower/Kite Shield in front
-    poly(d, [(38, 27), (54, 27), (54, 46), (46, 56), (38, 46)], (234, 179, 8, 255))
-    poly(d, [(40, 29), (52, 29), (52, 45), (46, 53), (40, 45)], (37, 99, 235, 255))
-    # Golden Cross Emblem + Shine
-    rect(d, 45, 31, 47, 50, (254, 240, 138, 255))
-    rect(d, 41, 37, 51, 40, (254, 240, 138, 255))
-    rect(d, 45, 37, 47, 40, (255, 255, 255, 255))
+    # Massive Ornate Tower/Kite Shield clearly held in front right
+    poly(d, [(41, 27), (57, 27), (57, 46), (49, 56), (41, 46)], (234, 179, 8, 255))
+    poly(d, [(43, 29), (55, 29), (55, 45), (49, 53), (43, 45)], (37, 99, 235, 255))
+    rect(d, 48, 31, 50, 50, (254, 240, 138, 255))
+    rect(d, 44, 37, 54, 40, (254, 240, 138, 255))
+    rect(d, 48, 37, 50, 40, (255, 255, 255, 255))
 
     return add_outline(img)
 

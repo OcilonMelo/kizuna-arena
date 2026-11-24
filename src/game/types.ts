@@ -155,8 +155,10 @@ export interface HeroRuntime {
   side: TeamSide;
   x: number;
   y: number;
+  z: number; // vertical jump/hover height
   vx: number;
   vy: number;
+  vz: number;
   facing: 1 | -1;
   hp: number;
   maxHp: number;
@@ -225,20 +227,31 @@ export interface VfxEffect {
     | 'explosion'
     | 'heal'
     | 'dash_ghost'
+    | 'sprite_ghost'
     | 'beam'
     | 'spark'
     | 'clash'
     | 'lightning'
     | 'muzzle'
-    | 'rune_circle';
+    | 'rune_circle'
+    | 'teleport_line'
+    | 'heal_beam'
+    | 'ground_crack'
+    | 'impact_star'
+    | 'meteor_drop'
+    | 'ice_spikes'
+    | 'buff_rise';
   x: number;
   y: number;
+  z?: number;
   targetX?: number;
   targetY?: number;
   angle?: number;
   radius: number;
   color: string;
   secondaryColor?: string;
+  heroId?: HeroId;
+  facing?: 1 | -1;
   age: number;
   duration: number;
 }

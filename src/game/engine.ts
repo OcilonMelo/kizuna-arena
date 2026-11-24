@@ -177,8 +177,10 @@ export class BattleEngine {
         side,
         x: pos.x,
         y: pos.y,
+        z: 0,
         vx: 0,
         vy: 0,
+        vz: 0,
         facing: side === 'player' ? 1 : -1,
         hp: maxHp,
         maxHp,
@@ -476,18 +478,22 @@ export class BattleEngine {
     h.x = Math.max(FLOOR_MIN_X, Math.min(FLOOR_MAX_X, h.x + Math.cos(angle) * dashDist));
     h.y = Math.max(FLOOR_MIN_Y, Math.min(FLOOR_MAX_Y, h.y + Math.sin(angle) * dashDist * 0.75));
 
-    for (let g = 1; g <= 3; g++) {
+    for (let g = 0; g < 3; g++) {
       this.vfx.push({
         id: uid('vfx'),
-        type: 'dash_ghost',
-        x: startX + ((h.x - startX) * g) / 4,
-        y: startY + ((h.y - startY) * g) / 4,
-        radius: 26,
+        type: 'sprite_ghost',
+        x: startX + ((h.x - startX) * g) / 3,
+        y: startY + ((h.y - startY) * g) / 3,
+        z: h.z + g * 5,
+        radius: 30,
         color: '#38bdf8',
+        heroId: h.heroId,
+        facing: h.facing,
         age: 0,
-        duration: 0.28,
+        duration: 0.28 + g * 0.04,
       });
     }
+    h.vz = Math.max(h.vz, 175);
     sound.playDodge();
     this.spawnFloatingText(h.x, h.y - 54, 'ESQUIVA!', '#38bdf8', 1.1);
     return true;
@@ -510,6 +516,16 @@ export class BattleEngine {
     if (Math.abs(h.hurtKnockX) > 0.1) {
       h.x = Math.max(FLOOR_MIN_X, Math.min(FLOOR_MAX_X, h.x + h.hurtKnockX * dt));
       h.hurtKnockX *= Math.pow(0.05, dt);
+    }
+
+    // 2.5D vertical jump/gravity physics
+    if (h.z > 0 || h.vz !== 0) {
+      h.z += h.vz * dt;
+      h.vz -= 920 * dt;
+      if (h.z <= 0) {
+        h.z = 0;
+        h.vz = 0;
+      }
     }
 
     if (!h.alive) {
@@ -641,15 +657,23 @@ export class BattleEngine {
       const dx = target.x - h.x;
       const dy = target.y - h.y;
       const len = Math.hypot(dx, dy) || 1;
-      // Subtle strafing wobble for more dynamic anime movement
-      const strafe = Math.sin(h.animTime * 2.4 + (h.side === 'player' ? 0 : 2)) * 0.25;
+      const strafe = Math.sin(h.animTime * 2.8 + (h.side === 'player' ? 0 : 2.1)) * 0.34;
       h.vx = ((dx / len) - (dy / len) * strafe) * speed;
-      h.vy = ((dy / len) + (dx / len) * strafe) * speed * 0.84;
+      h.vy = ((dy / len) + (dx / len) * strafe) * speed * 0.88;
       this.moveHero(h, dt);
     } else {
-      h.vx = 0;
-      h.vy = 0;
-      if (h.basicCooldown <= 0) {
+      // Dynamic combat footwork: orbit/flank subtly around target between swings instead of standing still!
+      if (h.basicCooldown > 0.12) {
+        const dx = target.x - h.x;
+        const dy = target.y - h.y;
+        const len = Math.hypot(dx, dy) || 1;
+        const orbitDir = (h.uid.length % 2 === 0 ? 1 : -1) * Math.sin(h.animTime * 1.4);
+        h.vx = (-dy / len) * speed * 0.48 * orbitDir;
+        h.vy = (dx / len) * speed * 0.42 * orbitDir;
+        this.moveHero(h, dt);
+      } else {
+        h.vx = 0;
+        h.vy = 0;
         this.performBasicAttack(h, target);
         h.basicCooldown = h.def.baseStats.attackCooldown;
       }
@@ -793,25 +817,31 @@ export class BattleEngine {
     enemies: HeroRuntime[],
     allies: HeroRuntime[]
   ): void {
-    h.attackAnim = 0.36;
+    h.attackAnim = 0.4;
     const atk = this.getEffectiveAtk(h);
+
+    // Visual Skill Name Callout above caster for every active skill!
+    if (!skill.isUltimate) {
+      this.spawnFloatingText(h.x, h.y - 98, `✦ ${skill.name.toUpperCase()}`, skill.color, 0.92);
+    }
 
     switch (skill.kind) {
       case 'melee_arc': {
         sound.playSlash();
+        h.vz = Math.max(h.vz, 130);
         const angle = Math.atan2(target.y - h.y, target.x - h.x);
         const radius = (skill.radius ?? 85) * 1.15;
         this.vfx.push({
           id: uid('vfx'),
-          type: 'slash',
-          x: h.x + Math.cos(angle) * 32,
-          y: h.y - 26 + Math.sin(angle) * 18,
+          type: 'cross_slash',
+          x: h.x + Math.cos(angle) * 38,
+          y: h.y - 28 + Math.sin(angle) * 18,
           angle,
-          radius: radius * 0.8,
+          radius: radius * 0.92,
           color: skill.color,
           secondaryColor: skill.secondaryColor,
           age: 0,
-          duration: 0.34,
+          duration: 0.38,
         });
         for (const e of enemies) {
           if (Math.hypot(e.x - h.x, e.y - h.y) <= radius + 20) {
@@ -821,7 +851,7 @@ export class BattleEngine {
             this.applyStatus(h, e, skill.statusEffect);
           }
         }
-        this.screenShake = Math.max(this.screenShake, skill.isUltimate ? 10 : 4);
+        this.screenShake = Math.max(this.screenShake, skill.isUltimate ? 10 : 4.5);
         break;
       }
 
@@ -836,23 +866,41 @@ export class BattleEngine {
         const nx = Math.max(FLOOR_MIN_X, Math.min(FLOOR_MAX_X, h.x + (dx / dist) * stepDist));
         const ny = Math.max(FLOOR_MIN_Y, Math.min(FLOOR_MAX_Y, h.y + (dy / dist) * stepDist));
 
-        for (let g = 1; g <= 4; g++) {
+        for (let g = 0; g < 5; g++) {
+          const frac = g / 5;
+          const arcZ = Math.sin(frac * Math.PI) * 58;
           this.vfx.push({
             id: uid('vfx'),
-            type: 'dash_ghost',
-            x: startX + ((nx - startX) * g) / 5,
-            y: startY + ((ny - startY) * g) / 5,
-            radius: 28,
+            type: 'sprite_ghost',
+            x: startX + (nx - startX) * frac,
+            y: startY + (ny - startY) * frac,
+            z: arcZ,
+            radius: 30,
             color: skill.color,
+            heroId: h.heroId,
+            facing: h.facing,
             age: 0,
-            duration: 0.28 + g * 0.04,
+            duration: 0.32 + g * 0.04,
           });
         }
         h.x = nx;
         h.y = ny;
+        h.z = 36;
+        h.vz = -180; // Slamming down from leap!
 
         const radius = (skill.radius ?? 85) * 1.15;
         sound.playExplosion();
+        this.vfx.push({
+          id: uid('vfx'),
+          type: 'ground_crack',
+          x: target.x,
+          y: target.y + 4,
+          radius: radius * 0.95,
+          color: skill.color,
+          secondaryColor: skill.secondaryColor,
+          age: 0,
+          duration: 0.65,
+        });
         this.vfx.push({
           id: uid('vfx'),
           type: 'explosion',
@@ -862,60 +910,82 @@ export class BattleEngine {
           color: skill.color,
           secondaryColor: skill.secondaryColor,
           age: 0,
-          duration: 0.4,
+          duration: 0.44,
         });
         for (const e of enemies) {
           if (Math.hypot(e.x - target.x, e.y - target.y) <= radius) {
             const crit = this.rollCrit(h);
+            e.vz = Math.max(e.vz, 170);
             this.applyDamage(h, e, atk * skill.power * (crit ? 1.55 : 1), crit, skill.color);
             this.applyStatus(h, e, skill.statusEffect);
           }
         }
-        this.spawnParticles(target.x, target.y - 20, skill.color, skill.isUltimate ? 32 : 16, 220);
-        this.screenShake = Math.max(this.screenShake, skill.isUltimate ? 12 : 5.5);
+        this.spawnParticles(target.x, target.y - 20, skill.color, skill.isUltimate ? 34 : 18, 240);
+        this.screenShake = Math.max(this.screenShake, skill.isUltimate ? 12 : 6);
         break;
       }
 
       case 'blink_backline': {
         sound.playDash();
+        const originX = h.x;
+        const originY = h.y;
         const blinkTarget =
           [...enemies].sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0] ?? target;
         this.vfx.push({
           id: uid('vfx'),
-          type: 'ring',
-          x: h.x,
-          y: h.y - 20,
-          radius: 48,
+          type: 'sprite_ghost',
+          x: originX,
+          y: originY,
+          z: h.z,
+          radius: 32,
           color: skill.color,
+          heroId: h.heroId,
+          facing: h.facing,
           age: 0,
-          duration: 0.32,
+          duration: 0.36,
         });
-        const behindOffset = blinkTarget.facing * -40;
+        const behindOffset = blinkTarget.facing * -42;
         h.x = Math.max(FLOOR_MIN_X, Math.min(FLOOR_MAX_X, blinkTarget.x + behindOffset));
         h.y = Math.max(
           FLOOR_MIN_Y,
           Math.min(FLOOR_MAX_Y, blinkTarget.y + (Math.random() - 0.5) * 24)
         );
         h.facing = blinkTarget.x >= h.x ? 1 : -1;
+        h.vz = Math.max(h.vz, 160);
+
+        // Unmistakable Anime Warp Line connecting origin -> target!
+        this.vfx.push({
+          id: uid('vfx'),
+          type: 'teleport_line',
+          x: originX,
+          y: originY - 26,
+          targetX: h.x,
+          targetY: h.y - 26,
+          radius: 6,
+          color: skill.color,
+          secondaryColor: skill.secondaryColor ?? '#ffffff',
+          age: 0,
+          duration: 0.34,
+        });
 
         sound.playSlash();
         this.vfx.push({
           id: uid('vfx'),
-          type: 'slash',
+          type: 'cross_slash',
           x: blinkTarget.x,
-          y: blinkTarget.y - 26,
+          y: blinkTarget.y - 28,
           angle: Math.atan2(blinkTarget.y - h.y, blinkTarget.x - h.x),
-          radius: skill.isUltimate ? 82 : 58,
+          radius: skill.isUltimate ? 92 : 66,
           color: skill.color,
           secondaryColor: skill.secondaryColor,
           age: 0,
-          duration: 0.34,
+          duration: 0.38,
         });
         const crit = skill.isUltimate ? true : this.rollCrit(h);
         this.applyDamage(h, blinkTarget, atk * skill.power * (crit ? 1.45 : 1), crit, skill.color);
         this.applyStatus(h, blinkTarget, skill.statusEffect);
-        this.spawnParticles(blinkTarget.x, blinkTarget.y - 22, skill.color, skill.isUltimate ? 28 : 14, 220);
-        this.screenShake = Math.max(this.screenShake, skill.isUltimate ? 10 : 4.5);
+        this.spawnParticles(blinkTarget.x, blinkTarget.y - 22, skill.color, skill.isUltimate ? 30 : 16, 230);
+        this.screenShake = Math.max(this.screenShake, skill.isUltimate ? 10 : 5);
         break;
       }
 
@@ -981,13 +1051,46 @@ export class BattleEngine {
           type: 'rune_circle',
           x: h.x,
           y: h.y + 4,
-          radius: 44,
+          radius: 48,
           color: skill.color,
           secondaryColor: skill.secondaryColor,
           age: 0,
-          duration: 0.45,
+          duration: 0.5,
         });
-        if (skill.id === 'lyra_thunder_strike' || skill.id === 'sora_ult_starfall') {
+        if (skill.kind === 'aoe_self') {
+          h.vz = Math.max(h.vz, 170);
+          this.vfx.push({
+            id: uid('vfx'),
+            type: 'ground_crack',
+            x: cx,
+            y: cy + 4,
+            radius,
+            color: skill.color,
+            secondaryColor: skill.secondaryColor,
+            age: 0,
+            duration: 0.72,
+          });
+        } else if (
+          skill.statusEffect?.type === 'slow' &&
+          (skill.color === '#22d3ee' || skill.color === '#06b6d4' || skill.color === '#0284c7')
+        ) {
+          this.vfx.push({
+            id: uid('vfx'),
+            type: 'ice_spikes',
+            x: cx,
+            y: cy,
+            radius,
+            color: skill.color,
+            secondaryColor: '#ffffff',
+            age: 0,
+            duration: 0.55,
+          });
+        } else if (
+          skill.id === 'lyra_thunder_strike' ||
+          skill.id === 'sora_ult_starfall' ||
+          skill.id === 'rai_taiko_bolt' ||
+          skill.id === 'rai_ult_heaven_judgment'
+        ) {
           this.vfx.push({
             id: uid('vfx'),
             type: 'lightning',
@@ -997,7 +1100,19 @@ export class BattleEngine {
             color: skill.color,
             secondaryColor: skill.secondaryColor,
             age: 0,
-            duration: 0.42,
+            duration: 0.48,
+          });
+        } else {
+          this.vfx.push({
+            id: uid('vfx'),
+            type: 'meteor_drop',
+            x: cx,
+            y: cy,
+            radius,
+            color: skill.color,
+            secondaryColor: skill.secondaryColor ?? '#fde047',
+            age: 0,
+            duration: 0.52,
           });
         }
         this.vfx.push({
@@ -1009,17 +1124,18 @@ export class BattleEngine {
           color: skill.color,
           secondaryColor: skill.secondaryColor,
           age: 0,
-          duration: skill.isUltimate ? 0.58 : 0.44,
+          duration: skill.isUltimate ? 0.62 : 0.46,
         });
         for (const e of enemies) {
           if (Math.hypot(e.x - cx, e.y - cy) <= radius + 16) {
             const crit = this.rollCrit(h);
+            e.vz = Math.max(e.vz, skill.isUltimate ? 210 : 120);
             this.applyDamage(h, e, atk * skill.power * (crit ? 1.45 : 1), crit, skill.color);
             this.applyStatus(h, e, skill.statusEffect);
           }
         }
-        this.spawnParticles(cx, cy - 16, skill.color, skill.isUltimate ? 34 : 18, 210);
-        this.screenShake = Math.max(this.screenShake, skill.isUltimate ? 11 : 5);
+        this.spawnParticles(cx, cy - 16, skill.color, skill.isUltimate ? 38 : 20, 225);
+        this.screenShake = Math.max(this.screenShake, skill.isUltimate ? 11 : 5.5);
         break;
       }
 
@@ -1030,14 +1146,27 @@ export class BattleEngine {
         this.applyHeal(h, lowest, healAmt);
         this.vfx.push({
           id: uid('vfx'),
+          type: 'heal_beam',
+          x: h.x,
+          y: h.y - 34,
+          targetX: lowest.x,
+          targetY: lowest.y - 28,
+          radius: 10,
+          color: skill.color,
+          secondaryColor: '#ffffff',
+          age: 0,
+          duration: 0.45,
+        });
+        this.vfx.push({
+          id: uid('vfx'),
           type: 'heal',
           x: lowest.x,
           y: lowest.y - 16,
-          radius: 48,
+          radius: 54,
           color: skill.color,
           secondaryColor: skill.secondaryColor,
           age: 0,
-          duration: 0.5,
+          duration: 0.55,
         });
         break;
       }
@@ -1053,14 +1182,27 @@ export class BattleEngine {
           this.applyStatus(h, a, skill.statusEffect);
           this.vfx.push({
             id: uid('vfx'),
+            type: 'heal_beam',
+            x: h.x,
+            y: h.y - 34,
+            targetX: a.x,
+            targetY: a.y - 28,
+            radius: 8,
+            color: skill.color,
+            secondaryColor: '#ffffff',
+            age: 0,
+            duration: 0.45,
+          });
+          this.vfx.push({
+            id: uid('vfx'),
             type: 'heal',
             x: a.x,
             y: a.y - 16,
-            radius: 52,
+            radius: 56,
             color: skill.color,
             secondaryColor: skill.secondaryColor,
             age: 0,
-            duration: 0.56,
+            duration: 0.6,
           });
         }
         break;
@@ -1075,13 +1217,23 @@ export class BattleEngine {
         }
         this.vfx.push({
           id: uid('vfx'),
+          type: 'buff_rise',
+          x: h.x,
+          y: h.y - 16,
+          radius: 52,
+          color: skill.color,
+          age: 0,
+          duration: 0.55,
+        });
+        this.vfx.push({
+          id: uid('vfx'),
           type: 'ring',
           x: h.x,
           y: h.y - 20,
-          radius: skill.radius ?? 62,
+          radius: skill.radius ?? 68,
           color: skill.color,
           age: 0,
-          duration: 0.45,
+          duration: 0.48,
         });
         if (skill.statusEffect?.type === 'taunt') {
           for (const e of enemies) {
@@ -1112,10 +1264,20 @@ export class BattleEngine {
           }
           this.vfx.push({
             id: uid('vfx'),
+            type: 'buff_rise',
+            x: a.x,
+            y: a.y - 16,
+            radius: 48,
+            color: skill.color,
+            age: 0,
+            duration: 0.55,
+          });
+          this.vfx.push({
+            id: uid('vfx'),
             type: 'ring',
             x: a.x,
             y: a.y - 18,
-            radius: 48,
+            radius: 50,
             color: skill.color,
             age: 0,
             duration: 0.48,
@@ -1213,8 +1375,19 @@ export class BattleEngine {
     }
 
     if (crit && !isDot) {
-      this.hitstop = Math.max(this.hitstop, 0.036);
-      this.screenShake = Math.max(this.screenShake, 3.8);
+      this.screenShake = Math.max(this.screenShake, 4.2);
+      target.vz = Math.max(target.vz, 130);
+      this.vfx.push({
+        id: uid('vfx'),
+        type: 'impact_star',
+        x: target.x,
+        y: target.y - 30 - target.z,
+        radius: 42,
+        color: '#fde047',
+        secondaryColor: color,
+        age: 0,
+        duration: 0.26,
+      });
     }
 
     this.spawnFloatingText(

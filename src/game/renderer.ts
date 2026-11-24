@@ -126,18 +126,55 @@ export function renderBattle(
     ctx.restore();
   }
 
-  // 4. Ground VFX (rings, heals, dash ghosts, spinning rune circles)
+  // 4. Ground VFX (rings, heals, dash ghosts, sprite afterimages, spinning rune circles, ground cracks)
   for (const v of engine.vfx) {
     if (
       v.type === 'ring' ||
       v.type === 'heal' ||
       v.type === 'dash_ghost' ||
-      v.type === 'rune_circle'
+      v.type === 'sprite_ghost' ||
+      v.type === 'rune_circle' ||
+      v.type === 'ground_crack'
     ) {
       const t = v.age / v.duration;
       ctx.save();
       ctx.globalAlpha = Math.max(0, 1 - t);
-      if (v.type === 'dash_ghost') {
+      if (v.type === 'sprite_ghost' && v.heroId) {
+        const sp = assets.sprites[v.heroId];
+        if (sp) {
+          const drawSize = 118;
+          ctx.globalAlpha = (1 - t) * 0.52;
+          ctx.translate(Math.round(v.x), Math.round(v.y - (v.z ?? 0)));
+          ctx.scale(v.facing ?? 1, 1);
+          ctx.drawImage(sp, -drawSize / 2, -drawSize + 14, drawSize, drawSize);
+          // Colored speed aura outline
+          ctx.strokeStyle = v.color;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.ellipse(0, -34, 34 * (1 - t * 0.2), 42 * (1 - t * 0.2), 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      } else if (v.type === 'ground_crack') {
+        // Radiating floor impact cracks + dust shockwave!
+        ctx.translate(v.x, v.y);
+        ctx.strokeStyle = '#09090b';
+        ctx.lineWidth = 4;
+        for (let k = 0; k < 7; k++) {
+          const a = (k / 7) * Math.PI * 2 + 0.3;
+          const r1 = v.radius * 0.35;
+          const r2 = v.radius * (0.75 + (k % 2) * 0.25);
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(Math.cos(a) * r1, Math.sin(a) * r1 * 0.5);
+          ctx.lineTo(Math.cos(a + 0.14) * r2, Math.sin(a + 0.14) * r2 * 0.5);
+          ctx.stroke();
+        }
+        ctx.strokeStyle = v.color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, v.radius * (0.3 + t * 0.8), v.radius * 0.45 * (0.3 + t * 0.8), 0, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (v.type === 'dash_ghost') {
         ctx.fillStyle = v.color;
         ctx.beginPath();
         ctx.ellipse(v.x, v.y - 24, 20 * (1 - t * 0.4), 30 * (1 - t * 0.3), 0, 0, Math.PI * 2);
@@ -151,7 +188,6 @@ export function renderBattle(
         ctx.beginPath();
         ctx.arc(0, 0, v.radius * (0.6 + t * 0.5), 0, Math.PI * 2);
         ctx.stroke();
-        // Inner inscribed diamond rune
         const r = v.radius * (0.55 + t * 0.45);
         ctx.strokeStyle = v.secondaryColor ?? '#ffffff';
         ctx.lineWidth = 2;
@@ -180,6 +216,12 @@ export function renderBattle(
           ctx.fillStyle = v.secondaryColor ?? '#4ade80';
           ctx.globalAlpha = (1 - t) * 0.25;
           ctx.fill();
+          // Rising healing '+' crosses!
+          ctx.globalAlpha = 1 - t;
+          ctx.font = 'bold 16px sans-serif';
+          ctx.fillStyle = '#4ade80';
+          ctx.fillText('✚', v.x - 16, v.y - 10 - t * 38);
+          ctx.fillText('✚', v.x + 14, v.y - 24 - t * 44);
         }
       }
       ctx.restore();
@@ -298,6 +340,115 @@ export function renderBattle(
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 3;
       ctx.stroke();
+      ctx.restore();
+    } else if (v.type === 'teleport_line' && v.targetX !== undefined && v.targetY !== undefined) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, 1 - t);
+      ctx.strokeStyle = v.color;
+      ctx.lineWidth = 10 * (1 - t * 0.7);
+      ctx.beginPath();
+      ctx.moveTo(v.x, v.y);
+      ctx.lineTo(v.targetX, v.targetY);
+      ctx.stroke();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3 * (1 - t * 0.5);
+      ctx.stroke();
+      ctx.restore();
+    } else if (v.type === 'heal_beam' && v.targetX !== undefined && v.targetY !== undefined) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, 1 - t);
+      ctx.strokeStyle = v.color;
+      ctx.lineWidth = 9 * (1 - t * 0.5);
+      ctx.beginPath();
+      ctx.moveTo(v.x, v.y);
+      const midX = (v.x + v.targetX) / 2;
+      const midY = (v.y + v.targetY) / 2 - 42;
+      ctx.quadraticCurveTo(midX, midY, v.targetX, v.targetY);
+      ctx.stroke();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.restore();
+    } else if (v.type === 'meteor_drop') {
+      // Falling flaming meteor streaking diagonally into the impact point!
+      ctx.save();
+      const drop = Math.min(1, t * 2.2);
+      const mx = v.x - (1 - drop) * 140;
+      const my = v.y - (1 - drop) * 260;
+      ctx.globalAlpha = Math.max(0, 1 - t * 0.85);
+      // Flame trail
+      ctx.strokeStyle = v.color;
+      ctx.lineWidth = 22 * (1 - t * 0.4);
+      ctx.beginPath();
+      ctx.moveTo(mx - 60, my - 110);
+      ctx.lineTo(mx, my);
+      ctx.stroke();
+      // Glowing meteor core
+      ctx.fillStyle = v.secondaryColor ?? '#fde047';
+      ctx.beginPath();
+      ctx.arc(mx, my, 20 * (1 - t * 0.3), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(mx, my, 10 * (1 - t * 0.3), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    } else if (v.type === 'ice_spikes') {
+      // 5 Jagged Ice Spears erupting upward from the arena floor!
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, 1 - t);
+      const grow = Math.min(1, t * 3.5);
+      for (let i = -2; i <= 2; i++) {
+        const sx = v.x + i * (v.radius * 0.36);
+        const sy = v.y + (Math.abs(i) % 2) * 10;
+        const h = (54 - Math.abs(i) * 8) * grow;
+        ctx.fillStyle = v.color;
+        ctx.beginPath();
+        ctx.moveTo(sx - 10, sy);
+        ctx.lineTo(sx, sy - h);
+        ctx.lineTo(sx + 10, sy);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(sx - 4, sy);
+        ctx.lineTo(sx, sy - h * 0.85);
+        ctx.lineTo(sx + 2, sy);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    } else if (v.type === 'buff_rise') {
+      // Rising golden power-up arrows around buffed hero
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, 1 - t);
+      ctx.font = '900 18px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = v.color;
+      ctx.fillText('▲', v.x - 22, v.y - t * 52);
+      ctx.fillText('▲', v.x, v.y - 16 - t * 62);
+      ctx.fillText('▲', v.x + 22, v.y - t * 52);
+      ctx.restore();
+    } else if (v.type === 'impact_star') {
+      // Razor-sharp 6-point anime crit impact star!
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, 1 - t);
+      ctx.translate(v.x, v.y);
+      ctx.rotate(t * 1.6);
+      const r = v.radius * (0.6 + t * 0.6);
+      ctx.fillStyle = v.color;
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = (i * Math.PI) / 3;
+        ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+        ctx.lineTo(Math.cos(a + Math.PI / 6) * (r * 0.25), Math.sin(a + Math.PI / 6) * (r * 0.25));
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.25, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
     }
   }
@@ -615,16 +766,21 @@ function drawHero(
   ctx.save();
   ctx.globalAlpha = h.deathAlpha;
 
-  // Ground shadow + team ring
+  // Ground shadow shrinks when leaping high in 2.5D!
+  const FLYERS: HeroId[] = ['ignis', 'bahamut', 'sylph', 'golem', 'seraph', 'freya', 'raijin'];
+  const hoverZ = FLYERS.includes(h.heroId) ? 14 + Math.sin(h.animTime * 4.5) * 6 : 0;
+  const totalZ = h.z + hoverZ;
+  const shadowScale = Math.max(0.55, 1 - totalZ / 160);
+
   ctx.fillStyle = 'rgba(0, 0, 0, 0.44)';
   ctx.beginPath();
-  ctx.ellipse(h.x, h.y + 4, 28, 12, 0, 0, Math.PI * 2);
+  ctx.ellipse(h.x, h.y + 4, 28 * shadowScale, 12 * shadowScale, 0, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.strokeStyle = h.side === 'player' ? '#38bdf8' : '#f43f5e';
   ctx.lineWidth = 2.5;
   ctx.beginPath();
-  ctx.ellipse(h.x, h.y + 4, 28, 12, 0, 0, Math.PI * 2);
+  ctx.ellipse(h.x, h.y + 4, 28 * shadowScale, 12 * shadowScale, 0, 0, Math.PI * 2);
   ctx.stroke();
 
   if (h.awakened && h.alive) {
@@ -633,7 +789,7 @@ function drawHero(
     ctx.lineWidth = 3;
     ctx.globalAlpha = 0.55 + Math.sin(h.animTime * 10) * 0.25;
     ctx.beginPath();
-    ctx.ellipse(h.x, h.y - 24, 38, 46, 0, 0, Math.PI * 2);
+    ctx.ellipse(h.x, h.y - 24 - totalZ, 38, 46, 0, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
   }
@@ -644,27 +800,27 @@ function drawHero(
     ctx.lineWidth = 5;
     ctx.globalAlpha = Math.min(1, h.ultimateAura) * 0.85;
     ctx.beginPath();
-    ctx.ellipse(h.x, h.y - 24, 42, 52, 0, 0, Math.PI * 2);
+    ctx.ellipse(h.x, h.y - 24 - totalZ, 42, 52, 0, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
   }
 
-  // Expressive Procedural Anime Animation: breathing + walk hop + attack lunge & tilt!
+  // Expressive Procedural Anime Animation: breathing + walk hop + 2.5D jump height + attack lunge & swing tilt!
   const isMoving = Math.hypot(h.vx, h.vy) > 6;
   const bob = isMoving ? Math.abs(Math.sin(h.walkPhase)) * 9 : Math.sin(h.animTime * 4) * 2;
-  const atkProgress = h.attackAnim > 0 ? Math.sin((h.attackAnim / 0.36) * Math.PI) : 0;
-  const lunge = atkProgress * (h.def.basicAttackIsRanged ? -8 : 22) * h.facing;
-  const tilt = atkProgress * (h.def.basicAttackIsRanged ? -0.14 : 0.24) * h.facing;
-  const scaleX = (isMoving ? 1 + Math.sin(h.walkPhase * 2) * 0.05 : 1 + atkProgress * 0.08) * h.facing;
+  const atkProgress = h.attackAnim > 0 ? Math.sin((h.attackAnim / 0.4) * Math.PI) : 0;
+  const lunge = atkProgress * (h.def.basicAttackIsRanged ? -10 : 26) * h.facing;
+  const tilt = atkProgress * (h.def.basicAttackIsRanged ? -0.18 : 0.28) * h.facing;
+  const scaleX = (isMoving ? 1 + Math.sin(h.walkPhase * 2) * 0.05 : 1 + atkProgress * 0.1) * h.facing;
   const scaleY = isMoving
     ? 1 - Math.sin(h.walkPhase * 2) * 0.05
-    : 1 + Math.sin(h.animTime * 4) * 0.03 - atkProgress * 0.06;
+    : 1 + Math.sin(h.animTime * 4) * 0.03 - atkProgress * 0.07;
 
   const sprite = assets.sprites[h.heroId];
   const drawSize = 118;
 
   ctx.save();
-  ctx.translate(Math.round(h.x + lunge), Math.round(h.y - bob));
+  ctx.translate(Math.round(h.x + lunge), Math.round(h.y - bob - totalZ));
   ctx.rotate(tilt);
   ctx.scale(scaleX, scaleY);
 
