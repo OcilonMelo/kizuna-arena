@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { HEROES, HERO_LIST, createDefaultMember } from '../game/heroes';
-import type { FormationCol, FormationRow, HeroId, TeamMemberConfig } from '../game/types';
+import type {
+  FormationCol,
+  FormationRow,
+  HeroId,
+  HeroRole,
+  TeamMemberConfig,
+} from '../game/types';
 
 interface TeamBuilderProps {
   title: string;
@@ -21,6 +27,17 @@ const ROWS: Array<{ id: FormationRow; label: string }> = [
   { id: 'bottom', label: 'Base' },
 ];
 
+const ROLE_FILTERS: Array<'Todos' | HeroRole> = [
+  'Todos',
+  'Tanque',
+  'Espadachim',
+  'Lutador',
+  'Assassino',
+  'Mago',
+  'Atirador',
+  'Suporte',
+];
+
 export const TeamBuilder: React.FC<TeamBuilderProps> = ({
   title,
   accent,
@@ -28,8 +45,13 @@ export const TeamBuilder: React.FC<TeamBuilderProps> = ({
   onChange,
 }) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [roleFilter, setRoleFilter] = useState<'Todos' | HeroRole>('Todos');
   const activeMember = team[selectedIndex] ?? team[0];
   const activeHero = HEROES[activeMember.heroId];
+  const filteredRoster =
+    roleFilter === 'Todos'
+      ? HERO_LIST
+      : HERO_LIST.filter((h) => h.role === roleFilter);
 
   const handleSelectHero = (heroId: HeroId) => {
     const existingIdx = team.findIndex((m) => m.heroId === heroId);
@@ -114,11 +136,25 @@ export const TeamBuilder: React.FC<TeamBuilderProps> = ({
         })}
       </div>
 
-      {/* Roster Picker */}
+      {/* Roster Picker with Class Filter */}
       <div className="tb-section">
-        <div className="tb-label">Trocar Herói do Slot #{selectedIndex + 1}</div>
+        <div className="tb-label">
+          Trocar Lutador do Slot #{selectedIndex + 1} ({HERO_LIST.length} disponíveis)
+        </div>
+        <div className="role-filter-bar">
+          {ROLE_FILTERS.map((rf) => (
+            <button
+              key={rf}
+              type="button"
+              className={`role-filter-pill ${roleFilter === rf ? 'active' : ''}`}
+              onClick={() => setRoleFilter(rf)}
+            >
+              {rf}
+            </button>
+          ))}
+        </div>
         <div className="roster-grid">
-          {HERO_LIST.map((hero) => {
+          {filteredRoster.map((hero) => {
             const inTeamIdx = team.findIndex((m) => m.heroId === hero.id);
             const isCurrent = activeMember.heroId === hero.id;
             return (

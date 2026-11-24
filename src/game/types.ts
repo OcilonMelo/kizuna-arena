@@ -16,7 +16,19 @@ export type HeroId =
   | 'cerberus'
   | 'medusa'
   | 'anubis'
-  | 'freya';
+  | 'freya'
+  | 'leviathan'
+  | 'behemoth'
+  | 'bahamut'
+  | 'kraken'
+  | 'kitsune'
+  | 'golem'
+  | 'raijin'
+  | 'valkor'
+  | 'aegis'
+  | 'sylph'
+  | 'oni'
+  | 'seraph';
 
 export type HeroRole =
   | 'Espadachim'

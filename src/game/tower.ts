@@ -361,4 +361,135 @@ export const TOWER_FLOORS: TowerFloor[] = [
       },
     ],
   },
+  {
+    floor: 16,
+    name: 'Andar 16 — Abismo dos Mares',
+    subtitle: 'Kraken e Leviatã dominam a arena com marés e tentáculos.',
+    statScale: 1.26,
+    enemyTeam: [
+      {
+        heroId: 'kraken',
+        slot: { col: 'front', row: 'center' },
+        activeSkillIds: ['krak_tentacle_slam', 'krak_abyss_shell'],
+        ultimateId: 'krak_ult_maelstrom',
+      },
+      {
+        heroId: 'leviathan',
+        slot: { col: 'back', row: 'top' },
+        activeSkillIds: ['lev_tidal_wave', 'lev_whirlpool'],
+        ultimateId: 'lev_ult_deluge',
+      },
+      {
+        heroId: 'kitsune',
+        slot: { col: 'back', row: 'bottom' },
+        activeSkillIds: ['kit_foxfire', 'kit_spirit_heal'],
+        ultimateId: 'kit_ult_nine_tails',
+      },
+    ],
+  },
+  {
+    floor: 17,
+    name: 'Andar 17 — Tempestade Divina',
+    subtitle: 'Raijin, Sylph e Seraph combinam velocidade e relâmpagos.',
+    statScale: 1.28,
+    enemyTeam: [
+      {
+        heroId: 'seraph',
+        slot: { col: 'mid', row: 'top' },
+        activeSkillIds: ['ser_light_blink', 'ser_solar_cross'],
+        ultimateId: 'ser_ult_dawn_blade',
+      },
+      {
+        heroId: 'raijin',
+        slot: { col: 'back', row: 'center' },
+        activeSkillIds: ['rai_taiko_bolt', 'rai_chain_sparks'],
+        ultimateId: 'rai_ult_heaven_judgment',
+      },
+      {
+        heroId: 'sylph',
+        slot: { col: 'back', row: 'bottom' },
+        activeSkillIds: ['syl_chakrams', 'syl_cyclone'],
+        ultimateId: 'syl_ult_hurricane',
+      },
+    ],
+  },
+  {
+    floor: 18,
+    name: 'Andar 18 — Órbita e Vazio',
+    subtitle: 'Aegis-09 dispara da retaguarda enquanto Valkor e Shuten avançam.',
+    statScale: 1.3,
+    enemyTeam: [
+      {
+        heroId: 'oni',
+        slot: { col: 'front', row: 'top' },
+        activeSkillIds: ['oni_kanabo_crush', 'oni_rampage'],
+        ultimateId: 'oni_ult_feast',
+      },
+      {
+        heroId: 'valkor',
+        slot: { col: 'mid', row: 'bottom' },
+        activeSkillIds: ['val_void_cleave', 'val_eclipse_dash'],
+        ultimateId: 'val_ult_infinity_rift',
+      },
+      {
+        heroId: 'aegis',
+        slot: { col: 'back', row: 'center' },
+        activeSkillIds: ['aeg_missiles', 'aeg_beam_rifle'],
+        ultimateId: 'aeg_ult_zero_cannon',
+      },
+    ],
+  },
+  {
+    floor: 19,
+    name: 'Andar 19 — Colossos Ancestrais',
+    subtitle: 'Behemoth, Bahamut e Kronos testam o limite da sua formação.',
+    statScale: 1.32,
+    enemyTeam: [
+      {
+        heroId: 'behemoth',
+        slot: { col: 'front', row: 'center' },
+        activeSkillIds: ['beh_stomp', 'beh_stone_skin'],
+        ultimateId: 'beh_ult_cataclysm',
+      },
+      {
+        heroId: 'bahamut',
+        slot: { col: 'mid', row: 'top' },
+        activeSkillIds: ['bah_starfire', 'bah_meteor_dive'],
+        ultimateId: 'bah_ult_megaflare',
+      },
+      {
+        heroId: 'golem',
+        slot: { col: 'back', row: 'bottom' },
+        activeSkillIds: ['gol_rewind', 'gol_chrono_zone'],
+        ultimateId: 'gol_ult_paradox',
+      },
+    ],
+  },
+  {
+    floor: 20,
+    name: 'Andar 20 — CHEFE FINAL ABSOLUTO: Trindade dos Titãs',
+    subtitle: 'Os 3 monstros épicos supremos de Kizuna Arena!',
+    isBoss: true,
+    statScale: 1.35,
+    enemyTeam: [
+      {
+        heroId: 'behemoth',
+        slot: { col: 'front', row: 'center' },
+        activeSkillIds: ['beh_stomp', 'beh_titan_charge'],
+        ultimateId: 'beh_ult_cataclysm',
+      },
+      {
+        heroId: 'bahamut',
+        slot: { col: 'mid', row: 'top' },
+        activeSkillIds: ['bah_meteor_dive', 'bah_king_roar'],
+        ultimateId: 'bah_ult_megaflare',
+      },
+      {
+        heroId: 'leviathan',
+        slot: { col: 'back', row: 'bottom' },
+        activeSkillIds: ['lev_whirlpool', 'lev_tidal_wave'],
+        ultimateId: 'lev_ult_deluge',
+      },
+    ],
+  },
 ];

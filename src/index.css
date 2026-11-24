@@ -1606,3 +1606,27 @@ body {
   height: 100%;
   transition: width 0.1s linear;
 }
+
+.role-filter-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.role-filter-pill {
+  background: var(--surface-2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.role-filter-pill.active {
+  background: rgba(56, 189, 248, 0.2);
+  color: #e0f2fe;
+  border-color: var(--blue);
+}

@@ -1,4 +1,5 @@
 import type { HeroDef, HeroId, TeamMemberConfig } from './types';
+import { EPIC_HEROES } from './heroes_epic';
 
 export const HEROES: Record<HeroId, HeroDef> = {
   ren: {
@@ -2002,6 +2003,7 @@ export const HEROES: Record<HeroId, HeroDef> = {
     defaultActiveIds: ['freya_valhalla_thrust', 'freya_war_song'],
     defaultUltimateId: 'freya_ult_asgard_judgment',
   },
+  ...EPIC_HEROES,
 };
 
 export const HERO_LIST: HeroDef[] = Object.values(HEROES);
