@@ -56,7 +56,7 @@ function runSingleBattle(
   return engine.result!;
 }
 
-const MATCHES = 600;
+const MATCHES = 3000;
 const heroStats: Record<
   HeroId,
   {

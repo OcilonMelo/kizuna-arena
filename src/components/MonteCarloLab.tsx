@@ -44,36 +44,39 @@ interface MatchupSummary {
 const COLS: FormationCol[] = ['front', 'mid', 'back'];
 const ROWS: FormationRow[] = ['top', 'center', 'bottom'];
 
-function buildRandomTeam(): TeamMemberConfig[] {
-  const pool = [...HERO_LIST].sort(() => Math.random() - 0.5).slice(0, 3);
-  const used = new Set<string>();
-  return pool.map((h) => {
-    const preferredCol: FormationCol =
-      h.role === 'Tanque'
-        ? 'front'
-        : h.role === 'Espadachim' || h.role === 'Lutador' || h.role === 'Assassino'
-        ? Math.random() > 0.4
+function buildDisjointTeams(): [TeamMemberConfig[], TeamMemberConfig[]] {
+  const pool = [...HERO_LIST].sort(() => Math.random() - 0.5);
+  const makeSide = (slice: typeof HERO_LIST): TeamMemberConfig[] => {
+    const used = new Set<string>();
+    return slice.map((h) => {
+      const preferredCol: FormationCol =
+        h.role === 'Tanque'
           ? 'front'
-          : 'mid'
-        : Math.random() > 0.35
-        ? 'back'
-        : 'mid';
-    let col = preferredCol;
-    let row = ROWS[Math.floor(Math.random() * ROWS.length)];
-    while (used.has(`${col}_${row}`)) {
-      col = COLS[Math.floor(Math.random() * COLS.length)];
-      row = ROWS[Math.floor(Math.random() * ROWS.length)];
-    }
-    used.add(`${col}_${row}`);
-    const actives = [...h.activeSkills].sort(() => Math.random() - 0.5);
-    const ult = h.ultimates[Math.floor(Math.random() * h.ultimates.length)];
-    return {
-      heroId: h.id,
-      slot: { col, row },
-      activeSkillIds: [actives[0].id, actives[1].id],
-      ultimateId: ult.id,
-    };
-  });
+          : h.role === 'Espadachim' || h.role === 'Lutador' || h.role === 'Assassino'
+          ? Math.random() > 0.4
+            ? 'front'
+            : 'mid'
+          : Math.random() > 0.35
+          ? 'back'
+          : 'mid';
+      let col = preferredCol;
+      let row = ROWS[Math.floor(Math.random() * ROWS.length)];
+      while (used.has(`${col}_${row}`)) {
+        col = COLS[Math.floor(Math.random() * COLS.length)];
+        row = ROWS[Math.floor(Math.random() * ROWS.length)];
+      }
+      used.add(`${col}_${row}`);
+      const actives = [...h.activeSkills].sort(() => Math.random() - 0.5);
+      const ult = h.ultimates[Math.floor(Math.random() * h.ultimates.length)];
+      return {
+        heroId: h.id,
+        slot: { col, row },
+        activeSkillIds: [actives[0].id, actives[1].id],
+        ultimateId: ult.id,
+      };
+    });
+  };
+  return [makeSide(pool.slice(0, 3)), makeSide(pool.slice(3, 6))];
 }
 
 function runHeadlessBattle(
@@ -218,10 +221,9 @@ export const MonteCarloLab: React.FC<MonteCarloLabProps> = ({
 
       const stepChunk = () => {
         if (cancelRef.current) return;
-        const chunk = Math.min(10, total - done);
+        const chunk = Math.min(16, total - done);
         for (let i = 0; i < chunk; i++) {
-          const t1 = buildRandomTeam();
-          const t2 = buildRandomTeam();
+          const [t1, t2] = buildDisjointTeams();
           const res = runHeadlessBattle(t1, t2, 1.0);
           done++;
           durSum += res.duration;
@@ -318,7 +320,7 @@ export const MonteCarloLab: React.FC<MonteCarloLabProps> = ({
 
         <div className="mc-count-group">
           <span>Batalhas:</span>
-          {(simMode === 'matchup' ? [50, 100, 300] : [100, 300, 600]).map((n) => (
+          {(simMode === 'matchup' ? [50, 100, 300] : [200, 500, 1000]).map((n) => (
             <button
               key={n}
               type="button"
