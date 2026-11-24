@@ -397,8 +397,8 @@ export class BattleEngine {
     const baseChance =
       h.def.role === 'Assassino'
         ? 0.28
-        : h.def.role === 'Espadachim' || h.def.role === 'Atirador'
-        ? 0.2
+        : h.def.role === 'Lutador' || h.def.role === 'Espadachim' || h.def.role === 'Atirador'
+        ? 0.21
         : 0.1;
     const chance = baseChance + (h.awakened ? 0.08 : 0);
     if (Math.random() > chance) return false;

@@ -580,6 +580,307 @@ def make_arena_bg():
     return img.resize((1280, 720), Image.Resampling.NEAREST)
 
 
+def make_ryuji():
+    """Ryuji — Punho do Trovão (64x64 spiky-haired lightning martial artist with electric gauntlets)"""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Flowing black martial arts sash tails
+    poly(d, [(22, 39), (9, 43), (11, 47), (23, 43)], (30, 41, 59, 255))
+    poly(d, [(21, 41), (12, 49), (16, 51), (24, 44)], (15, 23, 42, 255))
+
+    # Wide martial arts stance legs + white bandages
+    poly(d, [(20, 43), (27, 43), (21, 55), (15, 55)], (30, 41, 59, 255))
+    rect(d, 15, 51, 22, 55, (241, 245, 249, 255))
+    rect(d, 14, 55, 23, 59, (217, 119, 6, 255))
+    poly(d, [(30, 43), (37, 43), (42, 55), (35, 55)], (51, 65, 85, 255))
+    rect(d, 35, 51, 42, 55, (241, 245, 249, 255))
+    rect(d, 35, 55, 44, 59, (245, 158, 11, 255))
+
+    # Sleeveless orange-gold martial arts gi (open chest V)
+    poly(d, [(21, 29), (36, 29), (38, 44), (20, 44)], (245, 158, 11, 255))
+    poly(d, [(21, 29), (26, 29), (25, 44), (20, 44)], (217, 119, 6, 255))
+    poly(d, [(26, 29), (33, 29), (30, 37)], (253, 224, 196, 255))  # chest
+    rect(d, 20, 39, 38, 43, (15, 23, 42, 255))  # black belt
+    rect(d, 28, 39, 32, 43, (250, 204, 21, 255))
+
+    # Head with blazing golden-amber spiky anime hair
+    draw_anime_head(
+        d, 29, 19,
+        skin=(253, 224, 196, 255),
+        skin_sh=(230, 180, 146, 255),
+        eye_main=(245, 158, 11, 255),
+        eye_hi=(254, 249, 195, 255),
+        hair_base=(245, 158, 11, 255),
+        hair_sh=(180, 83, 9, 255),
+        hair_hi=(254, 240, 138, 255),
+    )
+    # Super spiky upward golden hair
+    poly(d, [(20, 12), (12, 6), (20, 16)], (245, 158, 11, 255))
+    poly(d, [(23, 10), (21, 2), (28, 10)], (250, 204, 21, 255))
+    poly(d, [(28, 10), (33, 2), (34, 11)], (250, 204, 21, 255))
+    poly(d, [(34, 12), (42, 7), (36, 16)], (245, 158, 11, 255))
+
+    # Muscular front arm + Glowing Thunder Gauntlet punching forward
+    rect(d, 34, 31, 42, 36, (253, 224, 196, 255))
+    rect(d, 41, 29, 51, 38, (30, 41, 59, 255))
+    rect(d, 42, 30, 50, 37, (250, 204, 21, 255))
+    rect(d, 44, 31, 49, 36, (255, 255, 255, 255))
+    # Crackling lightning sparks around fist
+    d.line([(48, 28), (53, 23), (51, 29)], fill=(254, 240, 138, 255), width=2)
+    d.line([(52, 35), (58, 33), (54, 39)], fill=(56, 189, 248, 255), width=2)
+    d.line([(44, 39), (47, 45)], fill=(254, 240, 138, 255), width=2)
+
+    return add_outline(img)
+
+
+def make_yuki():
+    """Yuki — Imperatriz da Geada (64x64 ice empress with crystal crown, frost kimono & ice fan)"""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Floating ice crystals behind her
+    poly(d, [(12, 16), (15, 22), (12, 28), (9, 22)], (103, 232, 249, 255))
+    d.point((12, 21), fill=(255, 255, 255, 255))
+    poly(d, [(48, 11), (51, 16), (48, 21), (45, 16)], (165, 243, 252, 255))
+
+    # Long flowing icy-white hair behind
+    poly(d, [(19, 18), (11, 45), (22, 47), (25, 22)], (186, 230, 253, 255))
+    poly(d, [(20, 19), (14, 43), (21, 45), (24, 22)], (240, 249, 255, 255))
+
+    # Royal Frost Kimono / Gown
+    poly(d, [(21, 29), (35, 29), (41, 57), (16, 57)], (8, 145, 178, 255))
+    poly(d, [(21, 29), (26, 29), (22, 57), (16, 57)], (14, 116, 144, 255))
+    # Pale frost inner robe + silver obi
+    poly(d, [(26, 30), (32, 30), (34, 56), (25, 56)], (224, 242, 254, 255))
+    rect(d, 20, 38, 37, 42, (56, 189, 248, 255))
+    rect(d, 26, 38, 31, 42, (255, 255, 255, 255))
+    rect(d, 17, 55, 40, 57, (165, 243, 252, 255))
+
+    # Flowing frost sleeve
+    poly(d, [(32, 30), (43, 32), (41, 43), (32, 40)], (224, 242, 254, 255))
+    rect(d, 41, 32, 44, 35, (255, 236, 230, 255))
+
+    # Head
+    draw_anime_head(
+        d, 28, 19,
+        skin=(255, 238, 232, 255),
+        skin_sh=(226, 200, 210, 255),
+        eye_main=(6, 182, 212, 255),
+        eye_hi=(255, 255, 255, 255),
+        hair_base=(224, 242, 254, 255),
+        hair_sh=(125, 211, 252, 255),
+        hair_hi=(255, 255, 255, 255),
+        blush=(165, 243, 252, 255),
+    )
+    # Ice Crystal Tiara / Crown
+    poly(d, [(21, 11), (24, 5), (27, 11)], (103, 232, 249, 255))
+    poly(d, [(26, 11), (29, 3), (32, 11)], (224, 242, 254, 255))
+    poly(d, [(31, 11), (34, 5), (37, 11)], (103, 232, 249, 255))
+
+    # Radiant Crystalline War Fan held forward
+    poly(d, [(43, 35), (56, 21), (60, 30), (55, 39), (44, 38)], (34, 211, 238, 255))
+    poly(d, [(45, 35), (55, 24), (58, 30), (54, 37)], (224, 242, 254, 255))
+    d.line([(44, 36), (57, 26)], fill=(6, 182, 212, 255))
+    d.line([(44, 36), (57, 32)], fill=(6, 182, 212, 255))
+
+    return add_outline(img)
+
+
+def make_drake():
+    """Drake — Lanceiro Dragão (64x64 crimson dragon knight with horned helm & dragon halberd)"""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Tattered dark dragon-wing cape behind
+    poly(d, [(22, 28), (6, 22), (9, 35), (5, 44), (20, 44)], (69, 10, 10, 255))
+    poly(d, [(21, 30), (10, 26), (12, 36), (19, 41)], (153, 27, 27, 255))
+
+    # Armored crimson dragon-scale legs
+    poly(d, [(21, 43), (27, 43), (23, 56), (17, 56)], (127, 29, 29, 255))
+    rect(d, 16, 54, 25, 59, (30, 27, 36, 255))
+    poly(d, [(30, 43), (36, 43), (40, 56), (34, 56)], (185, 28, 28, 255))
+    rect(d, 34, 54, 43, 59, (234, 179, 8, 255))
+
+    # Dragon-scale torso armor with gold sternum crest
+    poly(d, [(20, 28), (37, 28), (38, 44), (19, 44)], (153, 27, 27, 255))
+    poly(d, [(20, 28), (26, 28), (25, 44), (19, 44)], (127, 29, 29, 255))
+    poly(d, [(26, 30), (33, 30), (30, 40)], (250, 204, 21, 255))
+    rect(d, 19, 40, 38, 43, (30, 27, 36, 255))
+    # Spiked dragon pauldrons
+    poly(d, [(15, 26), (25, 26), (24, 34), (16, 33)], (220, 38, 38, 255))
+    poly(d, [(32, 26), (42, 26), (41, 34), (33, 34)], (220, 38, 38, 255))
+
+    # Head + Crimson Horned Dragon Helm
+    draw_anime_head(
+        d, 28, 19,
+        skin=(248, 214, 184, 255),
+        skin_sh=(218, 172, 138, 255),
+        eye_main=(250, 204, 21, 255),
+        eye_hi=(255, 255, 255, 255),
+        hair_base=(30, 27, 36, 255),
+        hair_sh=(15, 12, 20, 255),
+        hair_hi=(127, 29, 29, 255),
+    )
+    rect(d, 20, 10, 37, 16, (185, 28, 28, 255))
+    rect(d, 22, 11, 35, 14, (239, 68, 68, 255))
+    # Swept golden dragon horns
+    poly(d, [(22, 11), (13, 3), (19, 13)], (250, 204, 21, 255))
+    poly(d, [(33, 11), (42, 3), (36, 13)], (250, 204, 21, 255))
+
+    # Massive Dragon Halberd / Spear thrust diagonally
+    d.line([(16, 48), (54, 16)], fill=(71, 85, 105, 255), width=3)
+    poly(d, [(48, 18), (61, 8), (58, 21), (51, 22)], (239, 68, 68, 255))
+    poly(d, [(51, 17), (59, 10), (57, 18)], (254, 240, 138, 255))
+    poly(d, [(47, 22), (55, 27), (45, 28)], (250, 204, 21, 255))  # axe wing
+
+    return add_outline(img)
+
+
+def make_nova():
+    """Nova — Artilheira Cibernética (64x64 cyber-anime gunner with neon visor & plasma railcannon)"""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Cybernetic glowing jet-fin / energy pack on back
+    poly(d, [(13, 27), (22, 29), (21, 41), (12, 38)], (30, 41, 59, 255))
+    rect(d, 14, 30, 17, 36, (56, 189, 248, 255))
+
+    # Sleek cyber leggings & neon boots
+    poly(d, [(22, 43), (27, 43), (23, 55), (18, 55)], (15, 23, 42, 255))
+    rect(d, 17, 53, 25, 58, (236, 72, 153, 255))
+    poly(d, [(29, 43), (35, 43), (39, 55), (33, 55)], (30, 41, 59, 255))
+    rect(d, 33, 53, 42, 58, (244, 114, 182, 255))
+    rect(d, 34, 57, 42, 58, (56, 189, 248, 255))
+
+    # White & black cropped cyber jacket with neon-pink trim
+    poly(d, [(21, 29), (35, 29), (36, 43), (20, 43)], (241, 245, 249, 255))
+    poly(d, [(21, 29), (26, 29), (25, 43), (20, 43)], (148, 163, 184, 255))
+    rect(d, 25, 31, 32, 42, (15, 23, 42, 255))
+    rect(d, 27, 33, 30, 38, (56, 189, 248, 255))  # chest core
+    rect(d, 20, 39, 36, 41, (236, 72, 153, 255))
+
+    # Head with neon-pink bob hair & glowing cyber visor
+    draw_anime_head(
+        d, 28, 19,
+        skin=(254, 230, 214, 255),
+        skin_sh=(232, 192, 170, 255),
+        eye_main=(56, 189, 248, 255),
+        eye_hi=(255, 255, 255, 255),
+        hair_base=(236, 72, 153, 255),
+        hair_sh=(157, 23, 77, 255),
+        hair_hi=(251, 207, 232, 255),
+    )
+    # Cyber headphones & glowing cyan visor
+    rect(d, 25, 17, 36, 21, (56, 189, 248, 255))
+    rect(d, 27, 18, 35, 19, (224, 242, 254, 255))
+    rect(d, 19, 16, 23, 23, (30, 41, 59, 255))
+    rect(d, 20, 18, 22, 21, (244, 114, 182, 255))
+
+    # Heavy Plasma Rail-Cannon aimed forward
+    rect(d, 32, 31, 58, 38, (30, 41, 59, 255))
+    rect(d, 34, 32, 56, 34, (226, 232, 240, 255))
+    rect(d, 36, 34, 57, 36, (56, 189, 248, 255))  # glowing plasma barrel
+    rect(d, 56, 32, 61, 37, (244, 114, 182, 255))  # muzzle glow
+    rect(d, 58, 33, 61, 36, (255, 255, 255, 255))
+
+    return add_outline(img)
+
+
+def make_kael():
+    """Kael — Ceifador do Abismo (64x64 hooded spectral reaper with massive glowing soul scythe)"""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Floating spectral soul wisp behind
+    d.ellipse([10, 14, 18, 22], fill=(99, 102, 241, 255))
+    d.ellipse([12, 16, 16, 20], fill=(224, 242, 254, 255))
+
+    # Tattered floating abyssal reaper cloak
+    poly(d, [(20, 27), (36, 27), (41, 56), (34, 53), (28, 58), (22, 53), (14, 57)], (30, 27, 75, 255))
+    poly(d, [(20, 27), (26, 27), (22, 54), (14, 57)], (15, 23, 42, 255))
+    # Glowing indigo rune trim down front
+    rect(d, 27, 30, 30, 52, (99, 102, 241, 255))
+    rect(d, 28, 32, 29, 50, (199, 210, 254, 255))
+    # Rib/chain belt
+    rect(d, 20, 38, 37, 41, (71, 85, 105, 255))
+    rect(d, 27, 37, 31, 42, (129, 140, 248, 255))
+
+    # Deep Hooded Head with eerie shadowed face & glowing eyes
+    poly(d, [(17, 13), (38, 12), (40, 27), (16, 28)], (30, 27, 75, 255))
+    poly(d, [(20, 11), (36, 11), (32, 6), (22, 8)], (49, 46, 129, 255))
+    # Shadowed void inside hood
+    rect(d, 24, 16, 36, 26, (9, 9, 20, 255))
+    # Piercing glowing cyan-violet eyes
+    rect(d, 27, 19, 30, 21, (56, 189, 248, 255))
+    rect(d, 33, 19, 35, 21, (56, 189, 248, 255))
+    d.point((28, 20), fill=(255, 255, 255, 255))
+    d.point((34, 20), fill=(255, 255, 255, 255))
+
+    # Massive Curved Spectral Soul Scythe
+    d.line([(24, 56), (47, 14)], fill=(51, 65, 85, 255), width=3)
+    # Huge curved glowing crescent blade
+    poly(d, [(46, 13), (61, 18), (58, 33), (52, 24), (44, 18)], (99, 102, 241, 255))
+    poly(d, [(48, 15), (59, 20), (57, 30), (53, 22)], (165, 243, 252, 255))
+    d.line([(47, 14), (60, 19)], fill=(255, 255, 255, 255), width=2)
+
+    return add_outline(img)
+
+
+def make_tetsu():
+    """Tetsu — Colosso de Jade (64x64 heavy jade samurai-oni tank with kabuto & giant tetsubo club)"""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Giant Iron-Studded Tetsubo War Club resting over shoulder
+    d.line([(10, 12), (31, 34)], fill=(120, 53, 15, 255), width=5)
+    poly(d, [(5, 7), (16, 6), (25, 19), (16, 25), (6, 15)], (71, 85, 105, 255))
+    for sx, sy in [(9, 10), (14, 11), (12, 16), (18, 16), (17, 21)]:
+        rect(d, sx, sy, sx + 1, sy + 1, (250, 204, 21, 255))
+
+    # Heavy Jade Samurai Greaves
+    rect(d, 19, 45, 27, 59, (15, 118, 110, 255))
+    rect(d, 20, 46, 25, 56, (20, 184, 166, 255))
+    rect(d, 18, 56, 28, 59, (180, 83, 9, 255))
+    rect(d, 31, 45, 39, 59, (15, 118, 110, 255))
+    rect(d, 33, 46, 37, 56, (45, 212, 191, 255))
+    rect(d, 31, 56, 41, 59, (217, 119, 6, 255))
+
+    # Massive Layered Jade & Bronze Samurai-Oni Armor
+    rect(d, 17, 27, 41, 46, (17, 94, 89, 255))
+    rect(d, 19, 28, 39, 44, (20, 184, 166, 255))
+    # Glowing turquoise spirit core in chest
+    rect(d, 26, 32, 33, 38, (250, 204, 21, 255))
+    rect(d, 27, 33, 32, 37, (153, 246, 228, 255))
+    # Layered armor plates & bronze waist guard
+    rect(d, 17, 41, 41, 45, (180, 83, 9, 255))
+    rect(d, 27, 41, 32, 45, (250, 204, 21, 255))
+    # Huge Jade Sode (samurai shoulder guards)
+    rect(d, 13, 26, 22, 36, (15, 118, 110, 255))
+    rect(d, 14, 27, 21, 30, (45, 212, 191, 255))
+    rect(d, 14, 34, 21, 36, (250, 204, 21, 255))
+    rect(d, 36, 26, 45, 36, (15, 118, 110, 255))
+    rect(d, 37, 27, 44, 30, (45, 212, 191, 255))
+    rect(d, 37, 34, 44, 36, (250, 204, 21, 255))
+
+    # Armored Oni-Kabuto Helmet Head
+    rect(d, 21, 12, 37, 26, (15, 118, 110, 255))
+    rect(d, 23, 13, 35, 20, (20, 184, 166, 255))
+    # Oni face mask + glowing amber eyes
+    rect(d, 24, 18, 36, 25, (30, 41, 59, 255))
+    rect(d, 26, 19, 29, 21, (250, 204, 21, 255))
+    rect(d, 32, 19, 35, 21, (250, 204, 21, 255))
+    # Golden crescent Kabuto crest horns
+    poly(d, [(28, 13), (20, 4), (25, 13)], (250, 204, 21, 255))
+    poly(d, [(30, 13), (38, 4), (33, 13)], (250, 204, 21, 255))
+
+    # Armored gauntlet fist
+    rect(d, 40, 35, 48, 42, (20, 184, 166, 255))
+    rect(d, 42, 36, 47, 40, (250, 204, 21, 255))
+
+    return add_outline(img)
+
+
 def main():
     makers = {
         "ren": make_ren,
@@ -588,6 +889,12 @@ def main():
         "kage": make_kage,
         "sora": make_sora,
         "hana": make_hana,
+        "ryuji": make_ryuji,
+        "yuki": make_yuki,
+        "drake": make_drake,
+        "nova": make_nova,
+        "kael": make_kael,
+        "tetsu": make_tetsu,
     }
     for name, fn in makers.items():
         sprite = fn()

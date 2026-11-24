@@ -1,6 +1,25 @@
-export type HeroId = 'ren' | 'lyra' | 'bram' | 'kage' | 'sora' | 'hana';
+export type HeroId =
+  | 'ren'
+  | 'lyra'
+  | 'bram'
+  | 'kage'
+  | 'sora'
+  | 'hana'
+  | 'ryuji'
+  | 'yuki'
+  | 'drake'
+  | 'nova'
+  | 'kael'
+  | 'tetsu';
 
-export type HeroRole = 'Espadachim' | 'Mago' | 'Tanque' | 'Assassino' | 'Atirador' | 'Suporte';
+export type HeroRole =
+  | 'Espadachim'
+  | 'Mago'
+  | 'Tanque'
+  | 'Assassino'
+  | 'Atirador'
+  | 'Suporte'
+  | 'Lutador';
 
 export type TeamSide = 'player' | 'enemy';
 
