@@ -709,27 +709,31 @@ def make_arena_bg():
 
 
 def make_ryuji():
-    """Ryuji — Punho do Trovão (64x64 spiky-haired lightning martial artist with electric gauntlets)"""
+    """Ryuji — Punho do Trovão (64x64 martial artist with two clear electric fists)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
     # Flowing black martial arts sash tails
-    poly(d, [(22, 39), (9, 43), (11, 47), (23, 43)], (30, 41, 59, 255))
-    poly(d, [(21, 41), (12, 49), (16, 51), (24, 44)], (15, 23, 42, 255))
+    poly(d, [(22, 39), (9, 43), (11, 47), (23, 43)], (51, 65, 85, 255))
+    poly(d, [(21, 41), (12, 49), (16, 51), (24, 44)], (30, 41, 59, 255))
 
-    # Wide martial arts stance legs + white bandages
-    poly(d, [(20, 43), (27, 43), (21, 55), (15, 55)], (30, 41, 59, 255))
+    # Wide martial arts stance legs + white ankle wraps
+    poly(d, [(20, 43), (27, 43), (21, 55), (15, 55)], (51, 65, 85, 255))
     rect(d, 15, 51, 22, 55, (241, 245, 249, 255))
     rect(d, 14, 55, 23, 59, (217, 119, 6, 255))
-    poly(d, [(30, 43), (37, 43), (42, 55), (35, 55)], (51, 65, 85, 255))
+    poly(d, [(30, 43), (37, 43), (42, 55), (35, 55)], (71, 85, 105, 255))
     rect(d, 35, 51, 42, 55, (241, 245, 249, 255))
     rect(d, 35, 55, 44, 59, (245, 158, 11, 255))
 
-    # Sleeveless orange-gold martial arts gi (open chest V)
+    # Back arm raised in guard with electric wrap
+    rect(d, 15, 31, 22, 36, (253, 224, 196, 255))
+    rect(d, 12, 29, 17, 36, (250, 204, 21, 255))
+
+    # Sleeveless orange-gold martial arts gi
     poly(d, [(21, 29), (36, 29), (38, 44), (20, 44)], (245, 158, 11, 255))
     poly(d, [(21, 29), (26, 29), (25, 44), (20, 44)], (217, 119, 6, 255))
-    poly(d, [(26, 29), (33, 29), (30, 37)], (253, 224, 196, 255))  # chest
-    rect(d, 20, 39, 38, 43, (15, 23, 42, 255))  # black belt
+    poly(d, [(26, 29), (33, 29), (30, 37)], (253, 224, 196, 255))
+    rect(d, 20, 39, 38, 43, (30, 41, 59, 255))
     rect(d, 28, 39, 32, 43, (250, 204, 21, 255))
 
     # Head with blazing golden-amber spiky anime hair
@@ -743,21 +747,18 @@ def make_ryuji():
         hair_sh=(180, 83, 9, 255),
         hair_hi=(254, 240, 138, 255),
     )
-    # Super spiky upward golden hair
-    poly(d, [(20, 12), (12, 6), (20, 16)], (245, 158, 11, 255))
-    poly(d, [(23, 10), (21, 2), (28, 10)], (250, 204, 21, 255))
-    poly(d, [(28, 10), (33, 2), (34, 11)], (250, 204, 21, 255))
-    poly(d, [(34, 12), (42, 7), (36, 16)], (245, 158, 11, 255))
+    poly(d, [(20, 12), (13, 7), (20, 16)], (245, 158, 11, 255))
+    poly(d, [(23, 10), (21, 3), (28, 10)], (250, 204, 21, 255))
+    poly(d, [(28, 10), (33, 3), (34, 11)], (250, 204, 21, 255))
+    poly(d, [(34, 12), (41, 7), (36, 16)], (245, 158, 11, 255))
 
-    # Muscular front arm + Glowing Thunder Gauntlet punching forward
-    rect(d, 34, 31, 42, 36, (253, 224, 196, 255))
-    rect(d, 41, 29, 51, 38, (30, 41, 59, 255))
-    rect(d, 42, 30, 50, 37, (250, 204, 21, 255))
-    rect(d, 44, 31, 49, 36, (255, 255, 255, 255))
-    # Crackling lightning sparks around fist
-    d.line([(48, 28), (53, 23), (51, 29)], fill=(254, 240, 138, 255), width=2)
-    d.line([(52, 35), (58, 33), (54, 39)], fill=(56, 189, 248, 255), width=2)
-    d.line([(44, 39), (47, 45)], fill=(254, 240, 138, 255), width=2)
+    # Clear muscular front arm + wrapped punching fist + crisp lightning aura
+    rect(d, 35, 31, 44, 36, (253, 224, 196, 255))
+    rect(d, 43, 30, 47, 37, (226, 232, 240, 255))  # wrist tape
+    rect(d, 47, 29, 55, 38, (250, 204, 21, 255))   # clenched golden electric fist
+    rect(d, 51, 30, 54, 37, (254, 240, 138, 255))  # knuckles
+    d.line([(55, 29), (60, 24)], fill=(56, 189, 248, 255), width=2)
+    d.line([(56, 36), (61, 39)], fill=(56, 189, 248, 255), width=2)
 
     return add_outline(img)
 
@@ -956,55 +957,52 @@ def make_kael():
 
 
 def make_tetsu():
-    """Tetsu — Colosso de Jade (64x64 heavy jade samurai-oni tank with kabuto & giant tetsubo club)"""
+    """Tetsu — Colosso de Jade (64x64 jade samurai-oni tank holding a bright steel-and-gold tetsubo club)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    # Giant Iron-Studded Tetsubo War Club resting over shoulder
-    d.line([(10, 12), (31, 34)], fill=(120, 53, 15, 255), width=5)
-    poly(d, [(5, 7), (16, 6), (25, 19), (16, 25), (6, 15)], (71, 85, 105, 255))
-    for sx, sy in [(9, 10), (14, 11), (12, 16), (18, 16), (17, 21)]:
-        rect(d, sx, sy, sx + 1, sy + 1, (250, 204, 21, 255))
-
     # Heavy Jade Samurai Greaves
-    rect(d, 19, 45, 27, 59, (15, 118, 110, 255))
-    rect(d, 20, 46, 25, 56, (20, 184, 166, 255))
-    rect(d, 18, 56, 28, 59, (180, 83, 9, 255))
-    rect(d, 31, 45, 39, 59, (15, 118, 110, 255))
-    rect(d, 33, 46, 37, 56, (45, 212, 191, 255))
-    rect(d, 31, 56, 41, 59, (217, 119, 6, 255))
+    rect(d, 17, 45, 25, 59, (15, 118, 110, 255))
+    rect(d, 18, 46, 23, 56, (20, 184, 166, 255))
+    rect(d, 16, 56, 26, 59, (180, 83, 9, 255))
+    rect(d, 28, 45, 36, 59, (15, 118, 110, 255))
+    rect(d, 30, 46, 34, 56, (45, 212, 191, 255))
+    rect(d, 28, 56, 38, 59, (217, 119, 6, 255))
 
-    # Massive Layered Jade & Bronze Samurai-Oni Armor
-    rect(d, 17, 27, 41, 46, (17, 94, 89, 255))
-    rect(d, 19, 28, 39, 44, (20, 184, 166, 255))
-    # Glowing turquoise spirit core in chest
-    rect(d, 26, 32, 33, 38, (250, 204, 21, 255))
-    rect(d, 27, 33, 32, 37, (153, 246, 228, 255))
-    # Layered armor plates & bronze waist guard
-    rect(d, 17, 41, 41, 45, (180, 83, 9, 255))
-    rect(d, 27, 41, 32, 45, (250, 204, 21, 255))
-    # Huge Jade Sode (samurai shoulder guards)
-    rect(d, 13, 26, 22, 36, (15, 118, 110, 255))
-    rect(d, 14, 27, 21, 30, (45, 212, 191, 255))
-    rect(d, 14, 34, 21, 36, (250, 204, 21, 255))
-    rect(d, 36, 26, 45, 36, (15, 118, 110, 255))
-    rect(d, 37, 27, 44, 30, (45, 212, 191, 255))
-    rect(d, 37, 34, 44, 36, (250, 204, 21, 255))
+    # Layered Jade & Bronze Samurai-Oni Armor
+    rect(d, 16, 27, 38, 46, (17, 94, 89, 255))
+    rect(d, 18, 28, 36, 44, (20, 184, 166, 255))
+    rect(d, 24, 32, 31, 38, (250, 204, 21, 255))
+    rect(d, 25, 33, 30, 37, (153, 246, 228, 255))
+    rect(d, 16, 41, 38, 45, (180, 83, 9, 255))
+    rect(d, 25, 41, 30, 45, (250, 204, 21, 255))
+    # Jade Sode shoulder guards
+    rect(d, 12, 26, 20, 36, (15, 118, 110, 255))
+    rect(d, 13, 27, 19, 30, (45, 212, 191, 255))
+    rect(d, 13, 34, 19, 36, (250, 204, 21, 255))
+    rect(d, 34, 26, 42, 36, (15, 118, 110, 255))
+    rect(d, 35, 27, 41, 30, (45, 212, 191, 255))
+    rect(d, 35, 34, 41, 36, (250, 204, 21, 255))
 
-    # Armored Oni-Kabuto Helmet Head
-    rect(d, 21, 12, 37, 26, (15, 118, 110, 255))
-    rect(d, 23, 13, 35, 20, (20, 184, 166, 255))
-    # Oni face mask + glowing amber eyes
-    rect(d, 24, 18, 36, 25, (30, 41, 59, 255))
-    rect(d, 26, 19, 29, 21, (250, 204, 21, 255))
-    rect(d, 32, 19, 35, 21, (250, 204, 21, 255))
-    # Golden crescent Kabuto crest horns
-    poly(d, [(28, 13), (20, 4), (25, 13)], (250, 204, 21, 255))
-    poly(d, [(30, 13), (38, 4), (33, 13)], (250, 204, 21, 255))
+    # Oni-Kabuto Helmet Head
+    rect(d, 19, 12, 35, 26, (15, 118, 110, 255))
+    rect(d, 21, 13, 33, 20, (20, 184, 166, 255))
+    rect(d, 22, 18, 34, 25, (30, 41, 59, 255))
+    rect(d, 24, 19, 27, 21, (250, 204, 21, 255))
+    rect(d, 30, 19, 33, 21, (250, 204, 21, 255))
+    poly(d, [(26, 13), (18, 4), (23, 13)], (250, 204, 21, 255))
+    poly(d, [(28, 13), (36, 4), (31, 13)], (250, 204, 21, 255))
 
-    # Armored gauntlet fist
-    rect(d, 40, 35, 48, 42, (20, 184, 166, 255))
-    rect(d, 42, 36, 47, 40, (250, 204, 21, 255))
+    # Front Arm + Huge Bright Steel & Gold Studded Tetsubo Club held upright in front!
+    rect(d, 37, 34, 46, 40, (20, 184, 166, 255))
+    rect(d, 43, 33, 48, 40, (250, 204, 21, 255))
+    # Handle
+    rect(d, 45, 28, 48, 48, (146, 64, 14, 255))
+    # Heavy tapered bright-steel war club head
+    poly(d, [(43, 28), (50, 28), (54, 8), (41, 8)], (148, 163, 184, 255))
+    poly(d, [(45, 27), (49, 27), (52, 9), (44, 9)], (226, 232, 240, 255))
+    for sx, sy in [(43, 12), (51, 12), (44, 18), (50, 18), (45, 24), (49, 24)]:
+        rect(d, sx, sy, sx + 2, sy + 2, (250, 204, 21, 255))
 
     return add_outline(img)
 
@@ -1095,79 +1093,74 @@ def make_ignis():
 
 
 def make_cerberus():
-    """Cérbero — Cão do Submundo (64x64 hulking three-headed obsidian & lava hellhound)"""
+    """Cérbero — Cão do Submundo (64x64 high-contrast crimson-charcoal 3-headed hellhound with fangs & flames)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    # Fiery whip tail
-    d.line([(12, 36), (5, 28), (8, 23)], fill=(127, 29, 29, 255), width=3)
-    rect(d, 6, 21, 10, 25, (249, 115, 22, 255))
+    # Blazing demon tail
+    d.line([(13, 36), (6, 25), (10, 19)], fill=(153, 27, 27, 255), width=3)
+    poly(d, [(6, 20), (10, 13), (14, 20)], (249, 115, 22, 255))
 
-    # Hulking obsidian beast legs
-    rect(d, 13, 41, 22, 57, (30, 27, 36, 255))
-    rect(d, 12, 55, 23, 59, (185, 28, 28, 255))
-    rect(d, 33, 41, 43, 57, (45, 38, 52, 255))
-    rect(d, 34, 55, 45, 59, (220, 38, 38, 255))
+    # Muscular crimson-charcoal hound legs + fiery paws
+    poly(d, [(13, 41), (22, 41), (19, 56), (12, 56)], (92, 34, 42, 255))
+    rect(d, 11, 54, 21, 59, (239, 68, 68, 255))
+    poly(d, [(31, 41), (40, 41), (42, 56), (34, 56)], (127, 29, 29, 255))
+    rect(d, 34, 54, 45, 59, (249, 115, 22, 255))
 
-    # Massive muscular hellhound torso with glowing magma veins
-    poly(d, [(12, 31), (42, 28), (44, 45), (14, 45)], (30, 27, 36, 255))
-    d.line([(18, 34), (27, 38), (22, 42)], fill=(249, 115, 22, 255), width=2)
-    d.line([(29, 33), (36, 39)], fill=(250, 204, 21, 255), width=2)
+    # Muscular Hellhound Body with bright fiery magma mane
+    poly(d, [(12, 31), (40, 28), (42, 45), (14, 45)], (127, 29, 29, 255))
+    poly(d, [(16, 33), (38, 31), (38, 40), (17, 41)], (153, 27, 27, 255))
+    # Flaming shoulder mane
+    poly(d, [(25, 28), (33, 21), (42, 26), (38, 37), (26, 35)], (249, 115, 22, 255))
+    rect(d, 33, 26, 40, 36, (250, 204, 21, 255))  # golden spiked collar
 
-    # Spiked iron collar
-    rect(d, 34, 26, 42, 36, (100, 116, 139, 255))
-    for sy in (27, 31, 35):
-        rect(d, 36, sy, 39, sy + 1, (250, 204, 21, 255))
-
-    # THREE FIERCE HELLHOUND HEADS!
-    # Top head
-    poly(d, [(36, 12), (49, 11), (54, 17), (43, 21)], (45, 38, 52, 255))
-    rect(d, 44, 14, 47, 16, (250, 204, 21, 255))  # glowing eye
-    poly(d, [(38, 12), (37, 7), (42, 11)], (30, 27, 36, 255))
-    # Middle main head
-    poly(d, [(40, 22), (55, 22), (60, 28), (45, 32)], (30, 27, 36, 255))
-    rect(d, 49, 24, 53, 26, (239, 68, 68, 255))
-    d.point((51, 25), fill=(254, 240, 138, 255))
-    rect(d, 55, 29, 57, 31, (255, 255, 255, 255))  # fang
-    # Lower head
-    poly(d, [(38, 32), (52, 33), (56, 39), (42, 41)], (45, 38, 52, 255))
-    rect(d, 47, 35, 50, 37, (249, 115, 22, 255))
+    # THREE DISTINCT FIERCE HEADS with open jaws & white fangs!
+    # Head 1 (Top, raised)
+    poly(d, [(35, 11), (49, 10), (55, 16), (44, 20)], (153, 27, 27, 255))
+    poly(d, [(37, 11), (36, 5), (42, 10)], (127, 29, 29, 255))
+    rect(d, 44, 13, 48, 15, (254, 240, 138, 255))
+    rect(d, 50, 17, 53, 19, (255, 255, 255, 255))
+    # Head 2 (Center, lunging forward)
+    poly(d, [(39, 21), (55, 21), (61, 27), (46, 31)], (185, 28, 28, 255))
+    rect(d, 49, 23, 53, 25, (254, 240, 138, 255))
+    rect(d, 55, 28, 59, 30, (255, 255, 255, 255))
+    # Head 3 (Lower, snarling)
+    poly(d, [(37, 32), (51, 33), (57, 39), (43, 41)], (153, 27, 27, 255))
+    rect(d, 47, 35, 51, 37, (254, 240, 138, 255))
+    rect(d, 52, 39, 55, 41, (255, 255, 255, 255))
 
     return add_outline(img)
 
 
 def make_medusa():
-    """Medusa — Górgona Esmeralda (64x64 mythic gorgon with serpent tail & snake hair)"""
+    """Medusa — Górgona Esmeralda (64x64 coiled scaled serpent gorgon with curved snakes & venom staff)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    # Coiled Emerald Serpent Lower Body / Tail
-    poly(d, [(22, 39), (35, 39), (41, 50), (35, 58), (15, 58), (10, 51), (18, 47)], (22, 163, 74, 255))
-    poly(d, [(18, 49), (34, 49), (34, 56), (16, 56)], (74, 222, 128, 255))
-    # Tail tip curling left
-    poly(d, [(11, 52), (5, 45), (9, 43), (15, 50)], (21, 128, 61, 255))
-    # Golden scale belt
-    rect(d, 21, 38, 36, 41, (250, 204, 21, 255))
+    # Sinuous Coiled Scaled Emerald Serpent Tail
+    poly(d, [(21, 39), (34, 39), (40, 49), (33, 58), (14, 58), (9, 51), (18, 46)], (22, 163, 74, 255))
+    poly(d, [(17, 50), (33, 50), (32, 56), (16, 56)], (134, 239, 172, 255))
+    poly(d, [(10, 52), (5, 44), (9, 41), (14, 49)], (21, 128, 61, 255))
+    rect(d, 20, 38, 35, 41, (250, 204, 21, 255))
 
-    # Regal purple & gold gorgon corset/drape
-    poly(d, [(22, 28), (35, 28), (36, 39), (21, 39)], (107, 33, 168, 255))
-    rect(d, 26, 29, 31, 38, (147, 51, 234, 255))
-    rect(d, 27, 30, 30, 32, (74, 222, 128, 255))  # emerald jewel
+    # Regal Purple & Gold Gorgon Bodice
+    poly(d, [(21, 28), (34, 28), (35, 39), (20, 39)], (126, 34, 206, 255))
+    rect(d, 25, 29, 30, 38, (168, 85, 247, 255))
+    rect(d, 26, 30, 29, 32, (74, 222, 128, 255))
 
-    # Writhing Emerald Serpent Hair behind & around head!
-    for pts in [
-        [(20, 17), (10, 12), (8, 16), (17, 21)],
-        [(21, 12), (14, 5), (18, 5), (24, 12)],
-        [(28, 10), (31, 3), (35, 6), (31, 12)],
-        [(34, 14), (44, 10), (45, 14), (36, 18)],
-        [(19, 23), (11, 27), (14, 30), (21, 26)],
+    # Curved S-shaped Serpent Hair with snake heads & tiny red tongues!
+    for pts, head in [
+        ([(20, 16), (13, 14), (10, 9), (14, 8), (21, 13)], (10, 9)),
+        ([(24, 11), (22, 5), (27, 4), (28, 11)], (26, 4)),
+        ([(33, 13), (40, 8), (44, 11), (36, 16)], (43, 11)),
+        ([(19, 22), (12, 24), (9, 28), (14, 29), (20, 25)], (10, 28)),
     ]:
-        poly(d, pts, (22, 163, 74, 255))
-        d.point(pts[1], fill=(250, 204, 21, 255))  # snake eye
+        poly(d, pts, (34, 197, 94, 255))
+        d.point(head, fill=(250, 204, 21, 255))
 
-    # Head with pale jade-tinted skin & glowing violet petrifying eyes
+    # Head with glowing violet petrifying eyes
     draw_anime_head(
-        d, 28, 19,
+        d, 27, 19,
         skin=(220, 252, 231, 255),
         skin_sh=(167, 243, 208, 255),
         eye_main=(168, 85, 247, 255),
@@ -1177,11 +1170,13 @@ def make_medusa():
         hair_hi=(74, 222, 128, 255),
     )
 
-    # Raised arm casting glowing violet-green petrification orb
-    rect(d, 34, 30, 44, 34, (220, 252, 231, 255))
-    d.ellipse([44, 24, 56, 36], fill=(168, 85, 247, 255))
-    d.ellipse([47, 27, 53, 33], fill=(74, 222, 128, 255))
-    d.point((50, 30), fill=(255, 255, 255, 255))
+    # Hand holding an Ornate Serpent Venom Scepter!
+    rect(d, 34, 31, 44, 35, (220, 252, 231, 255))
+    rect(d, 44, 16, 46, 56, (107, 33, 168, 255))
+    # Glowing emerald-violet cobra head atop staff
+    poly(d, [(40, 16), (50, 16), (52, 9), (45, 6), (39, 10)], (168, 85, 247, 255))
+    d.ellipse([42, 9, 49, 15], fill=(74, 222, 128, 255))
+    d.point((45, 12), fill=(255, 255, 255, 255))
 
     return add_outline(img)
 
@@ -1284,163 +1279,177 @@ def make_freya():
 
 
 def make_leviathan():
-    """Leviatã — Serpente Abissal (64x64 coiled sea-dragon serpent with bioluminescent fins)"""
+    """Leviatã — Serpente Abissal (64x64 majestic S-curved sea dragon rising from foaming waves)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    # Coiled giant sea-serpent body
-    poly(d, [(10, 52), (24, 42), (40, 48), (36, 58), (14, 58)], (3, 105, 161, 255))
-    poly(d, [(14, 44), (10, 30), (24, 24), (34, 34), (24, 46)], (2, 132, 199, 255))
-    poly(d, [(22, 26), (34, 14), (44, 22), (34, 34)], (14, 165, 233, 255))
-    # Pale aqua underbelly scales
-    d.line([(16, 53), (34, 53)], fill=(186, 230, 253, 255), width=3)
-    d.line([(17, 36), (26, 30)], fill=(186, 230, 253, 255), width=3)
-    # Bioluminescent dorsal fins
-    poly(d, [(8, 30), (3, 23), (14, 24)], (56, 189, 248, 255))
-    poly(d, [(24, 16), (22, 7), (32, 14)], (125, 211, 252, 255))
-    # Fierce Sea-Dragon Head facing right
-    poly(d, [(36, 14), (52, 15), (60, 22), (55, 28), (40, 27)], (2, 132, 199, 255))
-    poly(d, [(38, 14), (34, 6), (44, 14)], (254, 240, 138, 255))  # horn
-    rect(d, 46, 18, 50, 20, (254, 240, 138, 255))  # glowing eye
-    d.point((55, 27), fill=(255, 255, 255, 255))  # fang
-    # Water splash droplets
-    for sx, sy in [(56, 34), (48, 42), (8, 42)]:
-        rect(d, sx, sy, sx + 2, sy + 2, (125, 211, 252, 255))
+    # Foaming ocean wave base
+    poly(d, [(6, 57), (16, 48), (28, 52), (42, 47), (54, 57)], (14, 165, 233, 255))
+    d.line([(10, 51), (20, 49), (32, 53), (46, 49)], fill=(224, 242, 254, 255), width=2)
+
+    # Sinuous Sea-Dragon Coils rising high
+    poly(d, [(12, 50), (14, 34), (27, 28), (34, 39), (26, 50)], (3, 105, 161, 255))
+    poly(d, [(20, 34), (26, 17), (40, 17), (35, 34)], (2, 132, 199, 255))
+    # Aqua belly plates
+    poly(d, [(25, 34), (31, 22), (36, 23), (31, 35)], (186, 230, 253, 255))
+    # Glowing Dorsal Spine Fins
+    for pts in [
+        [(13, 38), (6, 32), (16, 32)],
+        [(19, 26), (13, 18), (23, 21)],
+        [(28, 17), (24, 8), (34, 15)],
+    ]:
+        poly(d, pts, (56, 189, 248, 255))
+    # Fierce Sea-Dragon Head with open jaw, fangs & flowing whiskers!
+    poly(d, [(33, 14), (51, 13), (59, 19), (51, 23), (35, 22)], (14, 165, 233, 255))
+    poly(d, [(38, 22), (55, 24), (52, 28), (36, 26)], (3, 105, 161, 255))  # lower jaw
+    rect(d, 44, 16, 48, 18, (254, 240, 138, 255))  # eye
+    d.point((53, 22), fill=(255, 255, 255, 255))
+    d.point((50, 22), fill=(255, 255, 255, 255))
+    d.line([(48, 24), (57, 32), (61, 29)], fill=(125, 211, 252, 255), width=2)  # whisker
     return add_outline(img)
 
 
 def make_behemoth():
-    """Behemoth — Titã Terrestre (64x64 colossal horned earth-crystal boulder beast)"""
+    """Behemoth — Titã Terrestre (64x64 hunched gorilla-beast rock titan with crystal back spikes & huge fists)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    # Massive stone legs
-    rect(d, 14, 44, 25, 59, (87, 83, 78, 255))
-    rect(d, 34, 44, 46, 59, (120, 113, 108, 255))
-    rect(d, 14, 56, 26, 59, (161, 98, 7, 255))
-    rect(d, 34, 56, 47, 59, (161, 98, 7, 255))
+    # Jagged glowing amber crystal spikes erupting from back!
+    poly(d, [(12, 24), (7, 10), (19, 20)], (245, 158, 11, 255))
+    poly(d, [(18, 20), (19, 6), (28, 18)], (250, 204, 21, 255))
+    poly(d, [(26, 20), (31, 9), (35, 20)], (245, 158, 11, 255))
 
-    # Hulking boulder torso with glowing amber crystal core
-    poly(d, [(11, 22), (48, 22), (51, 46), (10, 46)], (87, 83, 78, 255))
-    poly(d, [(14, 24), (45, 24), (47, 42), (14, 42)], (120, 113, 108, 255))
-    # Glowing amber core + moss
-    poly(d, [(28, 28), (35, 34), (28, 40), (21, 34)], (245, 158, 11, 255))
-    poly(d, [(28, 30), (32, 34), (28, 38), (24, 34)], (254, 240, 138, 255))
-    rect(d, 12, 20, 24, 24, (22, 163, 74, 255))  # moss on shoulder
+    # Hunched beast hind legs
+    poly(d, [(12, 42), (23, 42), (19, 57), (10, 57)], (87, 83, 78, 255))
+    rect(d, 9, 55, 21, 59, (161, 98, 7, 255))
+    poly(d, [(27, 43), (36, 43), (38, 57), (29, 57)], (120, 113, 108, 255))
+    rect(d, 29, 55, 40, 59, (180, 83, 9, 255))
 
-    # Colossal boulder fist raised right
-    rect(d, 46, 28, 60, 44, (120, 113, 108, 255))
-    rect(d, 49, 30, 58, 36, (168, 162, 158, 255))
-    d.line([(48, 38), (58, 38)], fill=(245, 158, 11, 255), width=2)
+    # Broad hunched muscular stone torso + glowing magma chest crack
+    poly(d, [(12, 26), (34, 19), (47, 27), (43, 45), (14, 45)], (120, 113, 108, 255))
+    poly(d, [(14, 30), (30, 24), (30, 42), (14, 42)], (87, 83, 78, 255))
+    poly(d, [(29, 28), (36, 33), (29, 39), (24, 33)], (250, 204, 21, 255))
 
-    # Horned Titan Head
-    rect(d, 22, 11, 40, 23, (68, 64, 60, 255))
-    poly(d, [(22, 13), (13, 5), (20, 16)], (250, 204, 21, 255))
-    poly(d, [(39, 13), (49, 5), (41, 16)], (250, 204, 21, 255))
-    rect(d, 27, 15, 31, 18, (251, 146, 60, 255))
-    rect(d, 34, 15, 38, 18, (251, 146, 60, 255))
+    # Fierce Horned Beast Head thrust forward
+    poly(d, [(35, 17), (51, 17), (55, 27), (38, 29)], (87, 83, 78, 255))
+    poly(d, [(37, 17), (34, 8), (43, 16)], (254, 240, 138, 255))  # horn
+    poly(d, [(48, 26), (56, 23), (52, 29)], (255, 255, 255, 255))  # tusk
+    rect(d, 44, 20, 49, 23, (249, 115, 22, 255))  # glowing eye
+
+    # Colossal Front Arm & Slamming Boulder Fist
+    poly(d, [(39, 31), (52, 33), (59, 46), (44, 52), (37, 42)], (168, 162, 158, 255))
+    rect(d, 46, 42, 58, 53, (120, 113, 108, 255))
+    d.line([(47, 47), (57, 47)], fill=(250, 204, 21, 255), width=2)
     return add_outline(img)
 
 
 def make_bahamut():
-    """Bahamut — Dragão Estelar (64x64 cosmic winged dragon with violet scales & starfire)"""
+    """Bahamut — Dragão Estelar (64x64 majestic winged cosmic dragon with arched neck & open roaring jaws)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    # Cosmic starry wings spread wide
-    poly(d, [(24, 28), (4, 8), (8, 28), (17, 36), (27, 36)], (88, 28, 135, 255))
-    poly(d, [(24, 29), (10, 14), (13, 27), (24, 33)], (124, 58, 237, 255))
-    poly(d, [(35, 26), (55, 8), (52, 24), (38, 32)], (109, 40, 217, 255))
-    for sx, sy in [(12, 18), (17, 25), (47, 15), (43, 22)]:
+    # Huge Spread Cosmic Dragon Wings (left & right!)
+    poly(d, [(25, 31), (4, 10), (7, 29), (16, 36), (27, 37)], (88, 28, 135, 255))
+    poly(d, [(24, 32), (9, 16), (12, 28), (24, 34)], (139, 92, 246, 255))
+    poly(d, [(34, 28), (54, 7), (53, 24), (37, 33)], (109, 40, 217, 255))
+    for sx, sy in [(11, 19), (17, 26), (48, 14), (44, 21)]:
         d.point((sx, sy), fill=(254, 240, 138, 255))
 
-    # Dragon tail & legs
-    poly(d, [(18, 44), (5, 51), (10, 56), (22, 49)], (76, 29, 149, 255))
-    rect(d, 20, 44, 27, 58, (88, 28, 135, 255))
-    rect(d, 32, 44, 40, 58, (109, 40, 217, 255))
-    rect(d, 33, 56, 42, 58, (250, 204, 21, 255))
+    # Sweeping Dragon Tail + Clawed Legs
+    poly(d, [(20, 44), (5, 49), (9, 55), (23, 50)], (76, 29, 149, 255))
+    poly(d, [(20, 44), (27, 44), (24, 57), (18, 57)], (88, 28, 135, 255))
+    poly(d, [(31, 44), (38, 44), (41, 57), (34, 57)], (124, 58, 237, 255))
+    rect(d, 34, 55, 43, 58, (250, 204, 21, 255))
 
-    # Armored Cosmic Dragon Torso
-    poly(d, [(21, 27), (39, 27), (41, 46), (19, 46)], (109, 40, 217, 255))
-    poly(d, [(26, 29), (35, 29), (35, 44), (26, 44)], (56, 189, 248, 255))
+    # Sculpted Dragon Torso & Armored Cyan Chest Plates
+    poly(d, [(20, 31), (36, 29), (40, 46), (19, 46)], (109, 40, 217, 255))
+    poly(d, [(27, 31), (36, 31), (37, 44), (28, 44)], (56, 189, 248, 255))
+    for cy in (34, 38, 42):
+        d.line([(28, cy), (36, cy)], fill=(14, 116, 144, 255))
 
-    # Majestic Horned Dragon Head
-    poly(d, [(28, 13), (44, 13), (52, 20), (47, 25), (30, 25)], (124, 58, 237, 255))
-    poly(d, [(28, 14), (19, 4), (26, 16)], (250, 204, 21, 255))
-    poly(d, [(34, 13), (30, 3), (38, 13)], (254, 240, 138, 255))
-    rect(d, 40, 16, 44, 19, (56, 189, 248, 255))
-    d.point((42, 17), fill=(255, 255, 255, 255))
-    # Starfire glow at mouth
-    d.ellipse([51, 18, 60, 27], fill=(56, 189, 248, 255))
-    d.ellipse([54, 21, 58, 25], fill=(255, 255, 255, 255))
+    # Arched Dragon Neck + Roaring Horned Dragon Head
+    poly(d, [(27, 31), (35, 16), (43, 19), (36, 33)], (124, 58, 237, 255))
+    poly(d, [(34, 13), (52, 12), (58, 18), (47, 21), (35, 20)], (139, 92, 246, 255))  # upper snout
+    poly(d, [(38, 21), (54, 23), (50, 27), (36, 25)], (109, 40, 217, 255))  # open lower jaw
+    # Glowing cyan starfire inside open mouth!
+    rect(d, 47, 19, 54, 23, (56, 189, 248, 255))
+    rect(d, 49, 20, 52, 22, (255, 255, 255, 255))
+    # Swept golden dragon horns & eye
+    poly(d, [(34, 14), (24, 4), (31, 16)], (250, 204, 21, 255))
+    poly(d, [(40, 13), (35, 3), (44, 13)], (254, 240, 138, 255))
+    rect(d, 44, 15, 48, 17, (254, 240, 138, 255))
     return add_outline(img)
 
 
 def make_kraken():
-    """Kraken — Terror dos Mares (64x64 giant abyssal octopus monster with sweeping tentacles)"""
+    """Kraken — Terror dos Mares (64x64 menacing abyssal giant squid with 6 curling tentacles)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    # Sweeping tentacles below & sides
-    poly(d, [(18, 38), (6, 46), (8, 56), (18, 52), (24, 42)], (15, 118, 110, 255))
-    poly(d, [(24, 40), (19, 57), (27, 58), (30, 42)], (17, 94, 89, 255))
-    poly(d, [(32, 40), (35, 58), (43, 57), (38, 42)], (15, 118, 110, 255))
-    poly(d, [(40, 38), (54, 44), (58, 34), (52, 32), (46, 39)], (20, 184, 166, 255))
-    # Suction cups
-    for sx, sy in [(11, 50), (23, 52), (38, 52), (51, 39)]:
-        rect(d, sx, sy, sx + 2, sy + 2, (192, 132, 252, 255))
+    # 6 Tapered Curling Tentacles spreading dramatically!
+    for pts, cup in [
+        ([(20, 39), (7, 34), (4, 25), (10, 26), (13, 33), (22, 41)], (9, 32)),
+        ([(21, 41), (8, 49), (11, 56), (20, 51), (25, 43)], (14, 51)),
+        ([(26, 42), (22, 57), (28, 58), (30, 43)], (25, 52)),
+        ([(33, 42), (35, 58), (41, 57), (38, 43)], (37, 52)),
+        ([(39, 41), (50, 53), (56, 48), (48, 42), (42, 40)], (50, 48)),
+        ([(41, 39), (55, 35), (60, 24), (54, 24), (50, 32), (41, 36)], (53, 32)),
+    ]:
+        poly(d, pts, (15, 118, 110, 255))
+        rect(d, cup[0], cup[1], cup[0] + 2, cup[1] + 2, (216, 180, 254, 255))
 
-    # Giant bulbous Kraken Mantle / Head
-    d.ellipse([16, 10, 46, 42], fill=(15, 118, 110, 255))
-    d.ellipse([20, 12, 42, 34], fill=(20, 184, 166, 255))
-    # Head fins
-    poly(d, [(18, 16), (9, 11), (15, 24)], (13, 148, 136, 255))
-    poly(d, [(44, 16), (53, 11), (47, 24)], (13, 148, 136, 255))
-    # Glowing eldritch violet eyes
-    rect(d, 25, 28, 31, 33, (168, 85, 247, 255))
-    rect(d, 36, 28, 42, 33, (168, 85, 247, 255))
-    rect(d, 27, 29, 29, 31, (254, 240, 138, 255))
-    rect(d, 38, 29, 40, 31, (254, 240, 138, 255))
+    # Tall Ridged Giant Squid Mantle Crown
+    poly(d, [(32, 5), (46, 16), (43, 41), (21, 41), (18, 16)], (15, 118, 110, 255))
+    poly(d, [(32, 8), (42, 18), (39, 36), (25, 36), (22, 18)], (20, 184, 166, 255))
+    # Side arrow fins
+    poly(d, [(20, 16), (9, 10), (16, 24)], (13, 148, 136, 255))
+    poly(d, [(44, 16), (55, 10), (48, 24)], (13, 148, 136, 255))
+    # Menacing furrowed glowing violet-gold eyes!
+    poly(d, [(23, 27), (31, 30), (30, 34), (24, 33)], (168, 85, 247, 255))
+    poly(d, [(41, 27), (33, 30), (34, 34), (40, 33)], (168, 85, 247, 255))
+    rect(d, 26, 30, 28, 32, (254, 240, 138, 255))
+    rect(d, 36, 30, 38, 32, (254, 240, 138, 255))
     return add_outline(img)
 
 
 def make_kitsune():
-    """Tamamo — Kitsune das Nove Caudas (64x64 mystical nine-tailed fox spirit)"""
+    """Tamamo — Kitsune de 9 Caudas (64x64 fox spirit with clear golden-crimson fanned tails & foxfire)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    # Fanned glowing Nine Tails behind!
-    for tx, ty in [(6, 16), (12, 10), (20, 8), (6, 28), (10, 40)]:
-        poly(d, [(25, 36), (tx, ty), (tx + 6, ty - 2), (28, 32)], (255, 255, 255, 255))
-        rect(d, tx, ty, tx + 3, ty + 3, (244, 63, 94, 255))
+    # Fanned Warm-Gold & Crimson-Tipped Fox Tails (clear contrast from white hair!)
+    for tx, ty in [(6, 18), (11, 9), (19, 6), (5, 30), (9, 43)]:
+        poly(d, [(24, 38), (tx, ty), (tx + 7, ty + 2), (27, 34)], (254, 240, 138, 255))
+        poly(d, [(tx, ty), (tx + 5, ty), (tx + 4, ty + 5), (tx, ty + 4)], (244, 63, 94, 255))
 
-    # White & crimson spirit kimono
-    poly(d, [(22, 29), (36, 29), (41, 56), (18, 56)], (255, 255, 255, 255))
-    poly(d, [(22, 39), (37, 39), (40, 56), (19, 56)], (244, 63, 94, 255))
-    rect(d, 21, 38, 38, 41, (250, 204, 21, 255))
+    # Crisp Crimson & White Shrine Kimono
+    poly(d, [(22, 29), (36, 29), (41, 56), (18, 56)], (244, 63, 94, 255))
+    poly(d, [(23, 29), (35, 29), (35, 40), (23, 40)], (255, 255, 255, 255))
+    rect(d, 21, 38, 38, 42, (250, 204, 21, 255))
+    rect(d, 27, 39, 32, 43, (190, 18, 60, 255))
 
-    # Head with fox ears & golden eyes
+    # Head with sleek silver-white hair & distinct crimson-lined fox ears
     draw_anime_head(
         d, 29, 19,
         skin=(255, 236, 224, 255),
         skin_sh=(236, 198, 180, 255),
         eye_main=(245, 158, 11, 255),
         eye_hi=(255, 255, 255, 255),
-        hair_base=(255, 255, 255, 255),
-        hair_sh=(203, 213, 225, 255),
-        hair_hi=(254, 249, 195, 255),
+        hair_base=(226, 232, 240, 255),
+        hair_sh=(148, 163, 184, 255),
+        hair_hi=(255, 255, 255, 255),
         blush=(251, 113, 133, 255),
     )
-    # Tall fox ears with crimson tips
-    poly(d, [(21, 12), (19, 3), (26, 11)], (255, 255, 255, 255))
-    poly(d, [(20, 6), (19, 3), (22, 7)], (244, 63, 94, 255))
-    poly(d, [(32, 11), (37, 3), (37, 12)], (255, 255, 255, 255))
-    poly(d, [(35, 6), (37, 3), (37, 7)], (244, 63, 94, 255))
+    poly(d, [(21, 12), (19, 3), (26, 11)], (254, 240, 138, 255))
+    poly(d, [(20, 6), (19, 3), (23, 8)], (244, 63, 94, 255))
+    poly(d, [(32, 11), (37, 3), (37, 12)], (254, 240, 138, 255))
+    poly(d, [(34, 6), (37, 3), (37, 8)], (244, 63, 94, 255))
 
-    # Floating Golden Foxfire Orbs in front
-    for ox, oy in [(48, 22), (54, 33), (46, 40)]:
-        d.ellipse([ox - 4, oy - 4, ox + 4, oy + 4], fill=(244, 63, 94, 255))
-        d.ellipse([ox - 2, oy - 2, ox + 2, oy + 2], fill=(254, 240, 138, 255))
+    # Spirit Fan + Floating Foxfire Flames
+    poly(d, [(36, 33), (47, 27), (49, 35), (38, 38)], (250, 204, 21, 255))
+    for ox, oy in [(51, 19), (56, 30), (50, 41)]:
+        poly(d, [(ox, oy - 5), (ox + 4, oy + 2), (ox, oy + 5), (ox - 4, oy + 2)], (244, 63, 94, 255))
+        rect(d, ox - 1, oy, ox + 1, oy + 2, (254, 240, 138, 255))
     return add_outline(img)
 
 
@@ -1517,31 +1526,36 @@ def make_raijin():
 
 
 def make_valkor():
-    """Valkor — Cavaleiro do Vazio (64x64 cosmic dark knight with giant void greatsword)"""
+    """Valkor — Cavaleiro do Vazio (64x64 high-contrast cosmic silver-violet knight with void greatsword)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    # Tattered void cape
-    poly(d, [(21, 28), (7, 50), (22, 54), (30, 34)], (59, 7, 100, 255))
-    poly(d, [(22, 29), (12, 48), (21, 51), (28, 34)], (107, 33, 168, 255))
+    # Flowing magenta-violet cape
+    poly(d, [(21, 28), (7, 50), (22, 54), (30, 34)], (107, 33, 168, 255))
+    poly(d, [(22, 29), (12, 48), (21, 51), (28, 34)], (147, 51, 234, 255))
 
-    # Dark armored legs & chest
-    rect(d, 20, 44, 27, 58, (30, 27, 75, 255))
-    rect(d, 31, 44, 39, 58, (49, 46, 129, 255))
-    rect(d, 19, 28, 38, 45, (30, 27, 75, 255))
-    rect(d, 26, 30, 31, 42, (236, 72, 153, 255))  # glowing void core
+    # Metallic dark-silver armored legs & chest (pops clearly on dark arena!)
+    rect(d, 20, 44, 27, 58, (71, 85, 105, 255))
+    rect(d, 31, 44, 39, 58, (100, 116, 139, 255))
+    rect(d, 19, 28, 38, 45, (71, 85, 105, 255))
+    rect(d, 21, 29, 36, 41, (148, 163, 184, 255))
+    rect(d, 26, 31, 31, 40, (236, 72, 153, 255))  # glowing eclipse core
+    # Spiked violet pauldrons
+    poly(d, [(14, 26), (24, 26), (23, 34), (15, 33)], (147, 51, 234, 255))
+    poly(d, [(33, 26), (43, 26), (42, 34), (34, 34)], (147, 51, 234, 255))
 
     # Horned Eclipse Helmet
-    rect(d, 21, 11, 37, 26, (30, 27, 75, 255))
-    rect(d, 24, 17, 36, 21, (9, 9, 20, 255))
-    rect(d, 28, 18, 35, 20, (236, 72, 153, 255))  # glowing magenta visor
-    poly(d, [(21, 12), (13, 3), (20, 16)], (168, 85, 247, 255))
-    poly(d, [(37, 12), (45, 3), (38, 16)], (168, 85, 247, 255))
+    rect(d, 21, 11, 37, 26, (71, 85, 105, 255))
+    rect(d, 23, 12, 35, 16, (148, 163, 184, 255))
+    rect(d, 24, 17, 36, 21, (15, 23, 42, 255))
+    rect(d, 28, 18, 35, 20, (244, 114, 182, 255))
+    poly(d, [(21, 12), (13, 3), (20, 16)], (192, 132, 252, 255))
+    poly(d, [(37, 12), (45, 3), (38, 16)], (192, 132, 252, 255))
 
-    # Colossal Glowing Void Greatsword
-    poly(d, [(39, 36), (59, 10), (62, 15), (44, 40)], (147, 51, 234, 255))
-    d.line([(41, 36), (59, 13)], fill=(244, 114, 182, 255), width=2)
-    rect(d, 37, 34, 45, 38, (250, 204, 21, 255))  # crossguard
+    # Broad Glowing Void Greatsword held cleanly forward
+    rect(d, 36, 35, 44, 39, (250, 204, 21, 255))
+    poly(d, [(41, 35), (60, 10), (62, 16), (45, 39)], (192, 132, 252, 255))
+    d.line([(43, 35), (60, 13)], fill=(255, 255, 255, 255), width=2)
     return add_outline(img)
 
 
@@ -1581,18 +1595,20 @@ def make_aegis():
 
 
 def make_sylph():
-    """Sylph — Fada da Tempestade (64x64 luminous wind fairy with butterfly wings & wind chakram)"""
+    """Sylph — Fada da Tempestade (64x64 luminous wind fairy holding a glowing wind-blade wand)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    # Luminous Emerald-Gold Butterfly Wings
-    poly(d, [(23, 29), (6, 12), (8, 28), (18, 34)], (74, 222, 128, 255))
-    poly(d, [(22, 30), (11, 18), (12, 27)], (254, 249, 195, 255))
-    poly(d, [(23, 36), (10, 44), (16, 52), (24, 42)], (34, 197, 94, 255))
+    # Luminous Emerald-Gold Butterfly Wings (upper + lower)
+    poly(d, [(23, 29), (5, 10), (8, 28), (18, 34)], (74, 222, 128, 255))
+    poly(d, [(22, 30), (10, 17), (12, 27)], (254, 249, 195, 255))
+    poly(d, [(23, 36), (9, 44), (16, 52), (24, 42)], (34, 197, 94, 255))
 
-    # Floating Leaf-Petal Dress
-    poly(d, [(22, 29), (35, 29), (40, 50), (18, 50)], (34, 197, 94, 255))
-    poly(d, [(25, 31), (33, 31), (35, 48), (23, 48)], (187, 247, 208, 255))
+    # Floating Leaf-Petal Dress + legs
+    rect(d, 24, 48, 27, 55, (255, 236, 222, 255))
+    rect(d, 31, 48, 34, 55, (255, 236, 222, 255))
+    poly(d, [(22, 29), (35, 29), (40, 49), (18, 49)], (34, 197, 94, 255))
+    poly(d, [(25, 31), (33, 31), (35, 47), (23, 47)], (187, 247, 208, 255))
     rect(d, 22, 37, 36, 40, (250, 204, 21, 255))
 
     # Head with vibrant emerald hair
@@ -1608,14 +1624,16 @@ def make_sylph():
         blush=(253, 164, 175, 255),
     )
 
-    # Spinning Glowing Wind Chakram held forward
-    d.ellipse([43, 24, 59, 40], outline=(74, 222, 128, 255), width=3)
-    d.ellipse([46, 27, 56, 37], outline=(254, 249, 195, 255), width=2)
+    # Outstretched hand clearly gripping a Glowing Wind Chakram / Blade Ring!
+    rect(d, 34, 31, 44, 35, (255, 236, 222, 255))
+    d.ellipse([42, 22, 58, 38], outline=(74, 222, 128, 255), width=3)
+    d.ellipse([45, 25, 55, 35], outline=(254, 249, 195, 255), width=2)
+    poly(d, [(56, 26), (62, 30), (56, 34)], (255, 255, 255, 255))  # wind blade tip
     return add_outline(img)
 
 
 def make_oni():
-    """Shuten — Rei Oni Escarlate (64x64 crimson-skinned horned Oni warlord with blazing kanabo)"""
+    """Shuten — Rei Oni Escarlate (64x64 crimson Oni warlord with clear tusks & bright steel kanabo)"""
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
@@ -1625,20 +1643,19 @@ def make_oni():
     # Muscular crimson Oni legs + tiger-pelt waist wrap
     rect(d, 19, 44, 27, 58, (220, 38, 38, 255))
     rect(d, 31, 44, 40, 58, (220, 38, 38, 255))
-    rect(d, 19, 55, 28, 59, (30, 27, 36, 255))
-    rect(d, 31, 55, 41, 59, (30, 27, 36, 255))
-    # Tiger-striped loincloth
+    rect(d, 19, 55, 28, 59, (51, 65, 85, 255))
+    rect(d, 31, 55, 41, 59, (51, 65, 85, 255))
     rect(d, 18, 39, 41, 47, (250, 204, 21, 255))
     for tx in (21, 27, 33, 38):
         rect(d, tx, 40, tx + 2, 46, (30, 27, 36, 255))
 
-    # Broad Crimson Oni Torso with gold beads
+    # Broad Crimson Oni Torso with large golden prayer beads
     rect(d, 18, 27, 40, 40, (220, 38, 38, 255))
     rect(d, 20, 28, 37, 37, (239, 68, 68, 255))
-    for bx in (22, 26, 30, 34):
-        rect(d, bx, 29, bx + 2, 31, (250, 204, 21, 255))
+    for bx in (20, 25, 30, 35):
+        d.ellipse([bx, 28, bx + 4, 32], fill=(250, 204, 21, 255))
 
-    # Fierce Oni Head with curved golden horns
+    # Fierce Oni Head with curved golden horns & white lower fangs
     draw_anime_head(
         d, 29, 18,
         skin=(239, 68, 68, 255),
@@ -1649,12 +1666,17 @@ def make_oni():
         hair_sh=(148, 163, 184, 255),
         hair_hi=(255, 255, 255, 255),
     )
+    # White fangs on jaw for instant Oni readability
+    rect(d, 27, 23, 29, 25, (255, 255, 255, 255))
+    rect(d, 33, 23, 35, 25, (255, 255, 255, 255))
     poly(d, [(23, 11), (18, 2), (26, 10)], (250, 204, 21, 255))
     poly(d, [(33, 11), (39, 2), (36, 11)], (250, 204, 21, 255))
 
-    # Blazing Magma Kanabo War-Club
-    poly(d, [(40, 36), (57, 10), (62, 15), (46, 40)], (51, 65, 85, 255))
-    for sx, sy in [(47, 29), (51, 23), (55, 17), (58, 13)]:
+    # Bright Steel-and-Gold Spiked Kanabo War-Club gripped clearly in front arm!
+    rect(d, 37, 32, 45, 37, (239, 68, 68, 255))
+    poly(d, [(42, 38), (57, 10), (62, 14), (47, 41)], (148, 163, 184, 255))
+    d.line([(44, 37), (58, 12)], fill=(226, 232, 240, 255), width=2)
+    for sx, sy in [(47, 29), (51, 23), (55, 17), (58, 12)]:
         rect(d, sx, sy, sx + 2, sy + 2, (250, 204, 21, 255))
     return add_outline(img)
 
