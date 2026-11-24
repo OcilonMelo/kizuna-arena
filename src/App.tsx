@@ -7,8 +7,9 @@ import type { LoadedAssets } from './game/renderer';
 import type { BattleResult, SaveData, TeamMemberConfig } from './game/types';
 import { TeamBuilder } from './components/TeamBuilder';
 import { BattleView } from './components/BattleView';
+import { MonteCarloLab } from './components/MonteCarloLab';
 
-type Tab = 'hub' | 'tower' | 'team' | 'training';
+type Tab = 'hub' | 'tower' | 'team' | 'training' | 'montecarlo';
 
 interface ActiveBattle {
   mode: 'tower' | 'training';
@@ -141,6 +142,16 @@ export function App() {
             }}
           >
             ⚔ Treino
+          </button>
+          <button
+            type="button"
+            className={`nav-tab ${tab === 'montecarlo' && !activeBattle ? 'active' : ''}`}
+            onClick={() => {
+              setActiveBattle(null);
+              setTab('montecarlo');
+            }}
+          >
+            🧪 Monte Carlo
           </button>
         </nav>
 
@@ -430,6 +441,20 @@ export function App() {
               onChange={(next) => setSave((prev) => ({ ...prev, playerTeam: next }))}
             />
           </div>
+        ) : tab === 'montecarlo' ? (
+          <MonteCarloLab
+            playerTeam={save.playerTeam}
+            trainingEnemyTeam={save.trainingEnemyTeam}
+            onWatchMatchup={(title, enemyTeam, enemyStatScale) =>
+              setActiveBattle({
+                mode: 'training',
+                title: `Ao Vivo: ${title}`,
+                subtitle: 'Batalha iniciada a partir do Laboratório Monte Carlo.',
+                enemyTeam,
+                enemyStatScale,
+              })
+            }
+          />
         ) : (
           <div className="training-layout">
             <div className="training-launch-bar">
