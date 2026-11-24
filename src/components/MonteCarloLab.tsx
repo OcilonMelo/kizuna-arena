@@ -15,6 +15,7 @@ interface MonteCarloLabProps {
   trainingEnemyTeam: TeamMemberConfig[];
   onWatchMatchup: (
     title: string,
+    playerTeam: TeamMemberConfig[],
     enemyTeam: TeamMemberConfig[],
     enemyStatScale: number
   ) => void;
@@ -44,7 +45,7 @@ interface MatchupSummary {
 const COLS: FormationCol[] = ['front', 'mid', 'back'];
 const ROWS: FormationRow[] = ['top', 'center', 'bottom'];
 
-function buildDisjointTeams(): [TeamMemberConfig[], TeamMemberConfig[]] {
+function buildDisjointTeams(teamSize: number): [TeamMemberConfig[], TeamMemberConfig[]] {
   const pool = [...HERO_LIST].sort(() => Math.random() - 0.5);
   const makeSide = (slice: typeof HERO_LIST): TeamMemberConfig[] => {
     const used = new Set<string>();
@@ -76,7 +77,7 @@ function buildDisjointTeams(): [TeamMemberConfig[], TeamMemberConfig[]] {
       };
     });
   };
-  return [makeSide(pool.slice(0, 3)), makeSide(pool.slice(3, 6))];
+  return [makeSide(pool.slice(0, teamSize)), makeSide(pool.slice(teamSize, teamSize * 2))];
 }
 
 function runHeadlessBattle(
@@ -104,7 +105,8 @@ export const MonteCarloLab: React.FC<MonteCarloLabProps> = ({
   onWatchMatchup,
 }) => {
   const [simMode, setSimMode] = useState<SimMode>('matchup');
-  const [targetType, setTargetType] = useState<'training' | number>(0); // 0..11 floor idx or 'training'
+  const [targetType, setTargetType] = useState<'training' | number>('training');
+  const [teamSize, setTeamSize] = useState<3 | 4 | 5>(5);
   const [matchCount, setMatchCount] = useState<number>(100);
   const [running, setRunning] = useState(false);
 
@@ -125,14 +127,16 @@ export const MonteCarloLab: React.FC<MonteCarloLabProps> = ({
   const getSelectedOpponent = () => {
     if (targetType === 'training') {
       return {
-        title: 'Time do Modo Treino',
-        team: trainingEnemyTeam,
+        title: `Modo Treino (${teamSize}v${teamSize})`,
+        playerSlice: playerTeam.slice(0, teamSize),
+        team: trainingEnemyTeam.slice(0, teamSize),
         scale: 1.0,
       };
     }
     const fl = TOWER_FLOORS[targetType] ?? TOWER_FLOORS[0];
     return {
       title: fl.name,
+      playerSlice: playerTeam.slice(0, fl.enemyTeam.length),
       team: fl.enemyTeam,
       scale: fl.statScale,
     };
@@ -164,7 +168,7 @@ export const MonteCarloLab: React.FC<MonteCarloLabProps> = ({
         if (cancelRef.current) return;
         const chunk = Math.min(8, summary.total - summary.completed);
         for (let i = 0; i < chunk; i++) {
-          const res = runHeadlessBattle(playerTeam, opp.team, opp.scale);
+          const res = runHeadlessBattle(opp.playerSlice, opp.team, opp.scale);
           summary.completed++;
           summary.totalDuration += res.duration;
           if (res.winner === 'player') summary.playerWins++;
@@ -223,7 +227,7 @@ export const MonteCarloLab: React.FC<MonteCarloLabProps> = ({
         if (cancelRef.current) return;
         const chunk = Math.min(16, total - done);
         for (let i = 0; i < chunk; i++) {
-          const [t1, t2] = buildDisjointTeams();
+          const [t1, t2] = buildDisjointTeams(teamSize);
           const res = runHeadlessBattle(t1, t2, 1.0);
           done++;
           durSum += res.duration;
@@ -319,6 +323,21 @@ export const MonteCarloLab: React.FC<MonteCarloLabProps> = ({
         )}
 
         <div className="mc-count-group">
+          <span>Formato:</span>
+          {([3, 4, 5] as const).map((sz) => (
+            <button
+              key={sz}
+              type="button"
+              disabled={running}
+              className={`ctrl-btn ${teamSize === sz ? 'active' : ''}`}
+              onClick={() => setTeamSize(sz)}
+            >
+              {sz}v{sz}
+            </button>
+          ))}
+        </div>
+
+        <div className="mc-count-group">
           <span>Batalhas:</span>
           {(simMode === 'matchup' ? [50, 100, 300] : [200, 500, 1000]).map((n) => (
             <button
@@ -347,7 +366,7 @@ export const MonteCarloLab: React.FC<MonteCarloLabProps> = ({
             <button
               type="button"
               className="secondary-btn"
-              onClick={() => onWatchMatchup(opp.title, opp.team, opp.scale)}
+              onClick={() => onWatchMatchup(opp.title, opp.playerSlice, opp.team, opp.scale)}
             >
               ⚔ Assistir 1 Luta ao Vivo
             </button>
@@ -362,7 +381,7 @@ export const MonteCarloLab: React.FC<MonteCarloLabProps> = ({
             <div className="mc-mini-squad">
               <span className="blue-txt">SEU TIME</span>
               <div className="mc-mini-icons">
-                {playerTeam.map((m, i) => (
+                {opp.playerSlice.map((m, i) => (
                   <img
                     key={i}
                     src={HEROES[m.heroId].spritePath}

@@ -2023,13 +2023,17 @@ export function createDefaultMember(
 }
 
 export const DEFAULT_PLAYER_TEAM: TeamMemberConfig[] = [
-  createDefaultMember('bram', 'front', 'center'),
-  createDefaultMember('ren', 'mid', 'top'),
-  createDefaultMember('lyra', 'back', 'bottom'),
+  createDefaultMember('bram', 'front', 'top'),
+  createDefaultMember('ren', 'front', 'bottom'),
+  createDefaultMember('lyra', 'back', 'top'),
+  createDefaultMember('kage', 'mid', 'center'),
+  createDefaultMember('hana', 'back', 'bottom'),
 ];
 
 export const DEFAULT_TRAINING_ENEMY_TEAM: TeamMemberConfig[] = [
-  createDefaultMember('bram', 'front', 'center'),
-  createDefaultMember('kage', 'mid', 'bottom'),
+  createDefaultMember('tetsu', 'front', 'top'),
+  createDefaultMember('bahamut', 'front', 'bottom'),
   createDefaultMember('sora', 'back', 'top'),
+  createDefaultMember('fenrir', 'mid', 'center'),
+  createDefaultMember('ignis', 'back', 'bottom'),
 ];

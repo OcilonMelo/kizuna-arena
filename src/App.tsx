@@ -16,6 +16,7 @@ interface ActiveBattle {
   floorIndex?: number;
   title: string;
   subtitle?: string;
+  playerTeam: TeamMemberConfig[];
   enemyTeam: TeamMemberConfig[];
   enemyStatScale: number;
 }
@@ -24,6 +25,7 @@ export function App() {
   const [save, setSave] = useState<SaveData>(() => loadSaveData());
   const [tab, setTab] = useState<Tab>('hub');
   const [trainingSide, setTrainingSide] = useState<'player' | 'enemy'>('player');
+  const [trainingFormat, setTrainingFormat] = useState<3 | 4 | 5>(5);
   const [selectedFloorIdx, setSelectedFloorIdx] = useState<number>(() =>
     Math.min(TOWER_FLOORS.length - 1, loadSaveData().highestFloorCleared)
   );
@@ -44,12 +46,14 @@ export function App() {
 
   const startTowerBattle = (floorIdx: number) => {
     const fl = TOWER_FLOORS[floorIdx];
+    const size = fl.enemyTeam.length;
     setSelectedFloorIdx(floorIdx);
     setActiveBattle({
       mode: 'tower',
       floorIndex: floorIdx,
       title: fl.name,
       subtitle: fl.subtitle,
+      playerTeam: save.playerTeam.slice(0, size),
       enemyTeam: fl.enemyTeam,
       enemyStatScale: fl.statScale,
     });
@@ -58,9 +62,10 @@ export function App() {
   const startTrainingBattle = () => {
     setActiveBattle({
       mode: 'training',
-      title: 'Modo Treino — Arena Livre 3v3',
+      title: `Modo Treino — Arena Livre ${trainingFormat}v${trainingFormat}`,
       subtitle: 'Simulação livre para testar composições, formações e movesets.',
-      enemyTeam: save.trainingEnemyTeam,
+      playerTeam: save.playerTeam.slice(0, trainingFormat),
+      enemyTeam: save.trainingEnemyTeam.slice(0, trainingFormat),
       enemyStatScale: 1.0,
     });
   };
@@ -98,7 +103,7 @@ export function App() {
             setTab('hub');
           }}
         >
-          <span className="brand-badge">3v3 PIXEL AUTO-BATTLER</span>
+          <span className="brand-badge">3v3 · 4v4 · 5v5 PIXEL AUTO-BATTLER</span>
           <h1>KIZUNA ARENA</h1>
         </button>
 
@@ -167,7 +172,7 @@ export function App() {
           <BattleView
             title={activeBattle.title}
             subtitle={activeBattle.subtitle}
-            playerTeam={save.playerTeam}
+            playerTeam={activeBattle.playerTeam}
             enemyTeam={activeBattle.enemyTeam}
             enemyStatScale={activeBattle.enemyStatScale}
             assets={assets}
@@ -372,9 +377,11 @@ export function App() {
 
               <div className="vs-preview-split">
                 <div className="vs-box blue">
-                  <div className="tb-label">Seu Time</div>
+                  <div className="tb-label">
+                    Seu Time ({currentFloor.enemyTeam.length}v{currentFloor.enemyTeam.length})
+                  </div>
                   <div className="enemy-preview-row">
-                    {save.playerTeam.map((m, i) => {
+                    {save.playerTeam.slice(0, currentFloor.enemyTeam.length).map((m, i) => {
                       const def = HEROES[m.heroId];
                       return (
                         <div key={i} className="enemy-mini-card">
@@ -435,7 +442,7 @@ export function App() {
         ) : tab === 'team' ? (
           <div className="team-studio-wrap">
             <TeamBuilder
-              title="Estúdio de Time — Escolha seus 3 Heróis, Formação 3×3 e Moveset"
+              title="Estúdio de Time — Monte seu Esquadrão de 5 Lutadores (Slots 1–3 para 3v3, 1–4 para 4v4, 1–5 para 5v5)"
               accent="blue"
               team={save.playerTeam}
               onChange={(next) => setSave((prev) => ({ ...prev, playerTeam: next }))}
@@ -445,11 +452,12 @@ export function App() {
           <MonteCarloLab
             playerTeam={save.playerTeam}
             trainingEnemyTeam={save.trainingEnemyTeam}
-            onWatchMatchup={(title, enemyTeam, enemyStatScale) =>
+            onWatchMatchup={(title, pTeam, enemyTeam, enemyStatScale) =>
               setActiveBattle({
                 mode: 'training',
                 title: `Ao Vivo: ${title}`,
                 subtitle: 'Batalha iniciada a partir do Laboratório Monte Carlo.',
+                playerTeam: pTeam,
                 enemyTeam,
                 enemyStatScale,
               })
@@ -464,22 +472,35 @@ export function App() {
                   className={`nav-tab ${trainingSide === 'player' ? 'active' : ''}`}
                   onClick={() => setTrainingSide('player')}
                 >
-                  🔵 Editar Seu Time
+                  🔵 Seu Time
                 </button>
                 <button
                   type="button"
                   className={`nav-tab ${trainingSide === 'enemy' ? 'active' : ''}`}
                   onClick={() => setTrainingSide('enemy')}
                 >
-                  🔴 Editar Time Adversário
+                  🔴 Adversário
                 </button>
+              </div>
+              <div className="mc-count-group">
+                <span>Formato:</span>
+                {([3, 4, 5] as const).map((fmt) => (
+                  <button
+                    key={fmt}
+                    type="button"
+                    className={`ctrl-btn ${trainingFormat === fmt ? 'active' : ''}`}
+                    onClick={() => setTrainingFormat(fmt)}
+                  >
+                    {fmt}v{fmt}
+                  </button>
+                ))}
               </div>
               <button
                 type="button"
                 className="primary-btn play-cta"
                 onClick={startTrainingBattle}
               >
-                ⚔ INICIAR SIMULAÇÃO 3v3
+                ⚔ INICIAR SIMULAÇÃO {trainingFormat}v{trainingFormat}
               </button>
             </div>
 

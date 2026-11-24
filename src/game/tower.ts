@@ -96,11 +96,12 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['hana_bloom_heal', 'hana_holy_ward'],
         ultimateId: 'hana_ult_radiance',
       },
+      createDefaultMember('bram', 'front', 'center'),
     ],
   },
   {
     floor: 6,
-    name: 'Andar 6 — Cúpula Cibernética',
+    name: 'Andar 6 — Cúpula Cibernética (4v4)',
     subtitle: 'Nova dispara raios perfurantes protegida pelo Colosso de Jade.',
     statScale: 0.96,
     enemyTeam: [
@@ -122,12 +123,13 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['lyra_thunder_strike', 'lyra_mana_barrier'],
         ultimateId: 'lyra_ult_blizzard',
       },
+      createDefaultMember('aegis', 'mid', 'top'),
     ],
   },
   {
     floor: 7,
-    name: 'Andar 7 — Colheita das Sombras',
-    subtitle: 'Dois assassinos letais — Kael e Kage — caçando sua retaguarda.',
+    name: 'Andar 7 — Colheita das Sombras (4v4)',
+    subtitle: 'Assassinos letais caçando sua retaguarda em formação 4v4.',
     statScale: 0.99,
     enemyTeam: [
       {
@@ -148,12 +150,13 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['hana_sanctuary', 'hana_star_orb'],
         ultimateId: 'hana_ult_miracle',
       },
+      createDefaultMember('fenrir', 'mid', 'center'),
     ],
   },
   {
     floor: 8,
-    name: 'Andar 8 — Fúria Elemental',
-    subtitle: 'Ryuji, Yuki e Lyra: trovão, gelo e meteoros sem pausa.',
+    name: 'Andar 8 — Fúria Elemental (4v4)',
+    subtitle: 'Ryuji, Yuki, Lyra e Raijin: trovão, gelo e meteoros sem pausa.',
     statScale: 1.02,
     enemyTeam: [
       {
@@ -174,12 +177,13 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['lyra_frost_nova', 'lyra_arcane_bolts'],
         ultimateId: 'lyra_ult_meteor',
       },
+      createDefaultMember('raijin', 'back', 'top'),
     ],
   },
   {
     floor: 9,
-    name: 'Andar 9 — Artilharia Imperial',
-    subtitle: 'Fogo cruzado de Sora e Nova atrás da muralha de Bram.',
+    name: 'Andar 9 — Artilharia Imperial (4v4)',
+    subtitle: 'Fogo cruzado de Sora, Nova e Sylph atrás da muralha de Bram.',
     statScale: 1.05,
     enemyTeam: [
       {
@@ -200,12 +204,13 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['sora_arrow_rain', 'sora_pierce'],
         ultimateId: 'sora_ult_tempest',
       },
+      createDefaultMember('sylph', 'mid', 'center'),
     ],
   },
   {
     floor: 10,
-    name: 'Andar 10 — CHEFE: Colosso e Abismo',
-    subtitle: 'Tetsu segura a linha enquanto Drake e Kael destroem o campo.',
+    name: 'Andar 10 — CHEFE: Colosso e Abismo (4v4)',
+    subtitle: 'Tetsu segura a linha enquanto Drake, Kael e Valkor destroem o campo.',
     isBoss: true,
     statScale: 1.09,
     enemyTeam: [
@@ -227,12 +232,13 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['kael_abyss_blink', 'kael_reap'],
         ultimateId: 'kael_ult_harvest',
       },
+      createDefaultMember('valkor', 'front', 'top'),
     ],
   },
   {
     floor: 11,
-    name: 'Andar 11 — Guarda do Crepúsculo',
-    subtitle: 'Combinação de alto controle com Yuki, Ryuji e Nova.',
+    name: 'Andar 11 — Guarda do Crepúsculo (5v5)',
+    subtitle: 'Primeiro andar em formato completo 5v5!',
     statScale: 1.12,
     enemyTeam: [
       {
@@ -253,12 +259,14 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['nova_railgun', 'nova_emp_blast'],
         ultimateId: 'nova_ult_orbital',
       },
+      createDefaultMember('bram', 'front', 'bottom'),
+      createDefaultMember('hana', 'back', 'top'),
     ],
   },
   {
     floor: 12,
-    name: 'Andar 12 — CHEFE SUPREMO: Panteão Kizuna',
-    subtitle: 'O desafio final da Torre. Só uma formação perfeita vence!',
+    name: 'Andar 12 — CHEFE: Panteão Kizuna (5v5)',
+    subtitle: 'Esquadrão completo de 5 campeões!',
     isBoss: true,
     statScale: 1.16,
     enemyTeam: [
@@ -280,12 +288,14 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['nova_railgun', 'nova_emp_blast'],
         ultimateId: 'nova_ult_orbital',
       },
+      createDefaultMember('ren', 'front', 'top'),
+      createDefaultMember('lyra', 'back', 'top'),
     ],
   },
   {
     floor: 13,
-    name: 'Andar 13 — Fúria de Asgard',
-    subtitle: 'Fenrir e Freya lideram a investida nórdica com apoio da Fênix Ignis.',
+    name: 'Andar 13 — Fúria de Asgard (5v5)',
+    subtitle: 'Exército nórdico completo com Fenrir, Freya e Ignis.',
     statScale: 1.18,
     enemyTeam: [
       {
@@ -306,12 +316,14 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['ignis_rebirth_flame', 'ignis_ember_wings'],
         ultimateId: 'ignis_ult_phoenix_rise',
       },
+      createDefaultMember('bram', 'front', 'bottom'),
+      createDefaultMember('raijin', 'back', 'top'),
     ],
   },
   {
     floor: 14,
-    name: 'Andar 14 — Submundo e Areias',
-    subtitle: 'Cérbero segura a frente enquanto Anúbis e Medusa controlam a arena.',
+    name: 'Andar 14 — Submundo e Areias (5v5)',
+    subtitle: 'Cérbero, Anúbis, Medusa, Kael e Kronos em formação 5v5.',
     statScale: 1.21,
     enemyTeam: [
       {
@@ -332,12 +344,14 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['medusa_gaze', 'medusa_vipers'],
         ultimateId: 'medusa_ult_sanctuary',
       },
+      createDefaultMember('kael', 'front', 'bottom'),
+      createDefaultMember('golem', 'back', 'top'),
     ],
   },
   {
     floor: 15,
-    name: 'Andar 15 — CHEFE MÍTICO: Panteão Primordial',
-    subtitle: 'As 3 criaturas mais temidas da mitologia juntas no topo da Torre!',
+    name: 'Andar 15 — CHEFE MÍTICO: Panteão Primordial (5v5)',
+    subtitle: 'Cinco criaturas lendárias da mitologia unidas!',
     isBoss: true,
     statScale: 1.25,
     enemyTeam: [
@@ -359,12 +373,14 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['ignis_solar_bloom', 'ignis_solar_flare'],
         ultimateId: 'ignis_ult_phoenix_rise',
       },
+      createDefaultMember('anubis', 'front', 'top'),
+      createDefaultMember('medusa', 'back', 'top'),
     ],
   },
   {
     floor: 16,
-    name: 'Andar 16 — Abismo dos Mares',
-    subtitle: 'Kraken e Leviatã dominam a arena com marés e tentáculos.',
+    name: 'Andar 16 — Abismo dos Mares (5v5)',
+    subtitle: 'Kraken e Leviatã comandam as marés em 5v5.',
     statScale: 1.26,
     enemyTeam: [
       {
@@ -385,12 +401,14 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['kit_foxfire', 'kit_spirit_heal'],
         ultimateId: 'kit_ult_nine_tails',
       },
+      createDefaultMember('yuki', 'mid', 'top'),
+      createDefaultMember('tetsu', 'front', 'bottom'),
     ],
   },
   {
     floor: 17,
-    name: 'Andar 17 — Tempestade Divina',
-    subtitle: 'Raijin, Sylph e Seraph combinam velocidade e relâmpagos.',
+    name: 'Andar 17 — Tempestade Divina (5v5)',
+    subtitle: 'Raijin, Sylph, Seraph, Freya e Ryuji em alta velocidade.',
     statScale: 1.28,
     enemyTeam: [
       {
@@ -411,12 +429,14 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['syl_chakrams', 'syl_cyclone'],
         ultimateId: 'syl_ult_hurricane',
       },
+      createDefaultMember('freya', 'front', 'top'),
+      createDefaultMember('ryuji', 'front', 'bottom'),
     ],
   },
   {
     floor: 18,
-    name: 'Andar 18 — Órbita e Vazio',
-    subtitle: 'Aegis-09 dispara da retaguarda enquanto Valkor e Shuten avançam.',
+    name: 'Andar 18 — Órbita e Vazio (5v5)',
+    subtitle: 'Aegis-09 e Nova na retaguarda protegidos por Shuten e Valkor.',
     statScale: 1.3,
     enemyTeam: [
       {
@@ -437,12 +457,14 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['aeg_missiles', 'aeg_beam_rifle'],
         ultimateId: 'aeg_ult_zero_cannon',
       },
+      createDefaultMember('nova', 'back', 'top'),
+      createDefaultMember('behemoth', 'front', 'bottom'),
     ],
   },
   {
     floor: 19,
-    name: 'Andar 19 — Colossos Ancestrais',
-    subtitle: 'Behemoth, Bahamut e Kronos testam o limite da sua formação.',
+    name: 'Andar 19 — Colossos Ancestrais (5v5)',
+    subtitle: 'Behemoth, Bahamut, Kraken, Kronos e Tamamo!',
     statScale: 1.32,
     enemyTeam: [
       {
@@ -463,24 +485,26 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['gol_rewind', 'gol_chrono_zone'],
         ultimateId: 'gol_ult_paradox',
       },
+      createDefaultMember('kraken', 'front', 'top'),
+      createDefaultMember('kitsune', 'back', 'top'),
     ],
   },
   {
     floor: 20,
-    name: 'Andar 20 — CHEFE FINAL ABSOLUTO: Trindade dos Titãs',
-    subtitle: 'Os 3 monstros épicos supremos de Kizuna Arena!',
+    name: 'Andar 20 — CHEFE FINAL ABSOLUTO: Legião dos Titãs (5v5)',
+    subtitle: 'Os 5 monstros épicos supremos de Kizuna Arena juntos!',
     isBoss: true,
     statScale: 1.35,
     enemyTeam: [
       {
         heroId: 'behemoth',
-        slot: { col: 'front', row: 'center' },
+        slot: { col: 'front', row: 'top' },
         activeSkillIds: ['beh_stomp', 'beh_titan_charge'],
         ultimateId: 'beh_ult_cataclysm',
       },
       {
         heroId: 'bahamut',
-        slot: { col: 'mid', row: 'top' },
+        slot: { col: 'mid', row: 'center' },
         activeSkillIds: ['bah_meteor_dive', 'bah_king_roar'],
         ultimateId: 'bah_ult_megaflare',
       },
@@ -490,6 +514,8 @@ export const TOWER_FLOORS: TowerFloor[] = [
         activeSkillIds: ['lev_whirlpool', 'lev_tidal_wave'],
         ultimateId: 'lev_ult_deluge',
       },
+      createDefaultMember('cerberus', 'front', 'bottom'),
+      createDefaultMember('ignis', 'back', 'top'),
     ],
   },
 ];

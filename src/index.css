@@ -1630,3 +1630,32 @@ body {
   color: #e0f2fe;
   border-color: var(--blue);
 }
+
+/* ====== 5-SLOT RESPONSIVE SUPPORT ====== */
+.team-slots-row {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.hub-pedestal-row {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.enemy-preview-row {
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+}
+
+.dock-team {
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+}
+
+.hub-showcase-sprite {
+  width: 78px;
+  height: 78px;
+}
+
+@media (max-width: 960px) {
+  .team-slots-row,
+  .hub-pedestal-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
