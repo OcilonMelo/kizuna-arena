@@ -6,7 +6,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     floor: 1,
     name: 'Andar 1 — Pátio dos Iniciantes',
     subtitle: 'Um trio equilibrado para testar sua formação.',
-    statScale: 0.78,
+    statScale: 0.76,
     enemyTeam: [
       createDefaultMember('bram', 'front', 'center'),
       createDefaultMember('ren', 'mid', 'top'),
@@ -17,7 +17,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     floor: 2,
     name: 'Andar 2 — Dojo do Trovão',
     subtitle: 'Ryuji lidera investidas rápidas com apoio de Hana.',
-    statScale: 0.86,
+    statScale: 0.80,
     enemyTeam: [
       createDefaultMember('ryuji', 'front', 'center'),
       createDefaultMember('sora', 'back', 'top'),
@@ -28,7 +28,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     floor: 3,
     name: 'Andar 3 — Corte Congelante',
     subtitle: 'Yuki congela o campo enquanto Kage ataca sua retaguarda.',
-    statScale: 0.92,
+    statScale: 0.84,
     enemyTeam: [
       createDefaultMember('tetsu', 'front', 'center'),
       {
@@ -49,7 +49,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     floor: 4,
     name: 'Andar 4 — Muralha Arcana',
     subtitle: 'Escudos táticos e chuva de magias em área.',
-    statScale: 0.98,
+    statScale: 0.88,
     enemyTeam: [
       {
         heroId: 'bram',
@@ -76,7 +76,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     name: 'Andar 5 — CHEFE: Chama do Dragão',
     subtitle: 'Drake e Ren combinam fogo incessante e pressão corpo a corpo.',
     isBoss: true,
-    statScale: 1.08,
+    statScale: 0.93,
     enemyTeam: [
       {
         heroId: 'drake',
@@ -102,7 +102,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     floor: 6,
     name: 'Andar 6 — Cúpula Cibernética',
     subtitle: 'Nova dispara raios perfurantes protegida pelo Colosso de Jade.',
-    statScale: 1.14,
+    statScale: 0.96,
     enemyTeam: [
       {
         heroId: 'tetsu',
@@ -128,7 +128,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     floor: 7,
     name: 'Andar 7 — Colheita das Sombras',
     subtitle: 'Dois assassinos letais — Kael e Kage — caçando sua retaguarda.',
-    statScale: 1.2,
+    statScale: 0.99,
     enemyTeam: [
       {
         heroId: 'kael',
@@ -154,7 +154,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     floor: 8,
     name: 'Andar 8 — Fúria Elemental',
     subtitle: 'Ryuji, Yuki e Lyra: trovão, gelo e meteoros sem pausa.',
-    statScale: 1.25,
+    statScale: 1.02,
     enemyTeam: [
       {
         heroId: 'ryuji',
@@ -180,7 +180,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     floor: 9,
     name: 'Andar 9 — Artilharia Imperial',
     subtitle: 'Fogo cruzado de Sora e Nova atrás da muralha de Bram.',
-    statScale: 1.3,
+    statScale: 1.05,
     enemyTeam: [
       {
         heroId: 'bram',
@@ -207,7 +207,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     name: 'Andar 10 — CHEFE: Colosso e Abismo',
     subtitle: 'Tetsu segura a linha enquanto Drake e Kael destroem o campo.',
     isBoss: true,
-    statScale: 1.36,
+    statScale: 1.09,
     enemyTeam: [
       {
         heroId: 'tetsu',
@@ -233,7 +233,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     floor: 11,
     name: 'Andar 11 — Guarda do Crepúsculo',
     subtitle: 'Combinação de alto controle com Yuki, Ryuji e Nova.',
-    statScale: 1.42,
+    statScale: 1.12,
     enemyTeam: [
       {
         heroId: 'ryuji',
@@ -260,7 +260,7 @@ export const TOWER_FLOORS: TowerFloor[] = [
     name: 'Andar 12 — CHEFE SUPREMO: Panteão Kizuna',
     subtitle: 'O desafio final da Torre. Só uma formação perfeita vence!',
     isBoss: true,
-    statScale: 1.5,
+    statScale: 1.16,
     enemyTeam: [
       {
         heroId: 'tetsu',

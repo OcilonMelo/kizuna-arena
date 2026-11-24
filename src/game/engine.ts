@@ -1167,7 +1167,7 @@ export class BattleEngine {
   ): void {
     if (!target.alive) return;
     const reduction = 100 / (100 + target.defStat * 1.45);
-    let dmg = Math.max(8, Math.round(rawDamage * reduction));
+    let dmg = Math.max(8, Math.round(rawDamage * 0.78 * reduction));
 
     if (target.shield > 0) {
       const prevShield = target.shield;
