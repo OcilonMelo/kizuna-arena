@@ -881,6 +881,280 @@ def make_tetsu():
     return add_outline(img)
 
 
+def make_fenrir():
+    """Fenrir — Lobo do Crepúsculo (64x64 mythic Nordic frost-shadow giant wolf)"""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Bushy frost-shadow tail sweeping up behind
+    poly(d, [(14, 34), (4, 24), (8, 19), (18, 28), (19, 36)], (30, 41, 75, 255))
+    poly(d, [(7, 23), (10, 20), (16, 27), (12, 30)], (56, 189, 248, 255))
+
+    # Back muscular wolf legs
+    poly(d, [(16, 38), (24, 38), (19, 55), (13, 55)], (30, 41, 59, 255))
+    rect(d, 13, 54, 22, 58, (148, 163, 184, 255))
+    # Front prowling wolf legs
+    poly(d, [(35, 39), (43, 39), (46, 55), (39, 55)], (51, 65, 85, 255))
+    rect(d, 40, 54, 49, 58, (226, 232, 240, 255))
+    # Sharp icy claws
+    for cx in (46, 48, 50):
+        d.point((cx, 57), fill=(56, 189, 248, 255))
+
+    # Sleek powerful wolf torso with frost mane
+    poly(d, [(14, 31), (43, 28), (45, 42), (16, 43)], (30, 41, 75, 255))
+    poly(d, [(18, 36), (41, 35), (41, 42), (18, 42)], (148, 163, 184, 255))  # silver belly
+    # Frost-spike mane around neck/shoulders
+    poly(d, [(28, 26), (36, 17), (42, 25), (46, 21), (46, 34), (31, 35)], (56, 189, 248, 255))
+    poly(d, [(32, 27), (38, 21), (44, 29), (35, 33)], (224, 242, 254, 255))
+
+    # Fierce Wolf Head facing right
+    poly(d, [(37, 21), (51, 21), (58, 27), (56, 31), (42, 32)], (51, 65, 85, 255))
+    # Pointed wolf ears
+    poly(d, [(38, 21), (36, 12), (43, 19)], (30, 41, 75, 255))
+    poly(d, [(43, 20), (45, 11), (48, 19)], (51, 65, 85, 255))
+    # Glowing cyan eye + snout + fangs
+    rect(d, 46, 23, 50, 25, (56, 189, 248, 255))
+    d.point((48, 24), fill=(255, 255, 255, 255))
+    rect(d, 56, 27, 58, 29, (15, 23, 42, 255))  # nose
+    # White fangs
+    d.point((52, 31), fill=(255, 255, 255, 255))
+    d.point((55, 31), fill=(255, 255, 255, 255))
+    # Frost aura wisps
+    for sx, sy in [(22, 22), (55, 18), (59, 34)]:
+        rect(d, sx, sy, sx + 1, sy + 1, (125, 211, 252, 255))
+
+    return add_outline(img)
+
+
+def make_ignis():
+    """Ignis — Fênix Imortal (64x64 majestic winged fiery mythic phoenix hovering in air)"""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Flowing blazing tail plumes trailing down-left
+    poly(d, [(22, 37), (6, 48), (11, 53), (25, 42)], (220, 38, 38, 255))
+    poly(d, [(24, 39), (12, 55), (18, 57), (28, 43)], (249, 115, 22, 255))
+    poly(d, [(20, 41), (10, 49), (14, 51), (22, 43)], (254, 240, 138, 255))
+
+    # Huge spread left/back fiery wing
+    poly(d, [(26, 28), (6, 12), (10, 24), (16, 28), (12, 34), (27, 34)], (220, 38, 38, 255))
+    poly(d, [(25, 29), (11, 17), (15, 26), (25, 31)], (249, 115, 22, 255))
+    poly(d, [(24, 29), (16, 22), (19, 27)], (254, 240, 138, 255))
+
+    # Huge spread right/front fiery wing
+    poly(d, [(35, 29), (58, 12), (54, 25), (47, 29), (52, 35), (36, 35)], (239, 68, 68, 255))
+    poly(d, [(36, 30), (53, 17), (48, 26), (37, 32)], (251, 146, 60, 255))
+    poly(d, [(37, 30), (47, 22), (44, 28)], (254, 240, 138, 255))
+
+    # Majestic Golden-Crimson Phoenix Body
+    poly(d, [(25, 27), (38, 27), (40, 40), (31, 45), (23, 39)], (249, 115, 22, 255))
+    poly(d, [(28, 29), (36, 29), (36, 39), (31, 42), (27, 38)], (254, 240, 138, 255))
+    # Golden talons tucked
+    rect(d, 28, 44, 30, 48, (250, 204, 21, 255))
+    rect(d, 34, 44, 36, 48, (250, 204, 21, 255))
+
+    # Phoenix Head, Golden Crest & Beak facing right
+    rect(d, 28, 15, 39, 26, (239, 68, 68, 255))
+    rect(d, 30, 17, 38, 24, (249, 115, 22, 255))
+    # Flowing golden head crest
+    poly(d, [(31, 15), (22, 7), (28, 14), (24, 11), (34, 15)], (250, 204, 21, 255))
+    poly(d, [(33, 15), (30, 6), (36, 14)], (254, 240, 138, 255))
+    # Radiant eye & sharp golden beak
+    rect(d, 35, 19, 37, 21, (255, 255, 255, 255))
+    poly(d, [(39, 19), (46, 22), (39, 24)], (250, 204, 21, 255))
+
+    return add_outline(img)
+
+
+def make_cerberus():
+    """Cérbero — Cão do Submundo (64x64 hulking three-headed obsidian & lava hellhound)"""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Fiery whip tail
+    d.line([(12, 36), (5, 28), (8, 23)], fill=(127, 29, 29, 255), width=3)
+    rect(d, 6, 21, 10, 25, (249, 115, 22, 255))
+
+    # Hulking obsidian beast legs
+    rect(d, 13, 41, 22, 57, (30, 27, 36, 255))
+    rect(d, 12, 55, 23, 59, (185, 28, 28, 255))
+    rect(d, 33, 41, 43, 57, (45, 38, 52, 255))
+    rect(d, 34, 55, 45, 59, (220, 38, 38, 255))
+
+    # Massive muscular hellhound torso with glowing magma veins
+    poly(d, [(12, 31), (42, 28), (44, 45), (14, 45)], (30, 27, 36, 255))
+    d.line([(18, 34), (27, 38), (22, 42)], fill=(249, 115, 22, 255), width=2)
+    d.line([(29, 33), (36, 39)], fill=(250, 204, 21, 255), width=2)
+
+    # Spiked iron collar
+    rect(d, 34, 26, 42, 36, (100, 116, 139, 255))
+    for sy in (27, 31, 35):
+        rect(d, 36, sy, 39, sy + 1, (250, 204, 21, 255))
+
+    # THREE FIERCE HELLHOUND HEADS!
+    # Top head
+    poly(d, [(36, 12), (49, 11), (54, 17), (43, 21)], (45, 38, 52, 255))
+    rect(d, 44, 14, 47, 16, (250, 204, 21, 255))  # glowing eye
+    poly(d, [(38, 12), (37, 7), (42, 11)], (30, 27, 36, 255))
+    # Middle main head
+    poly(d, [(40, 22), (55, 22), (60, 28), (45, 32)], (30, 27, 36, 255))
+    rect(d, 49, 24, 53, 26, (239, 68, 68, 255))
+    d.point((51, 25), fill=(254, 240, 138, 255))
+    rect(d, 55, 29, 57, 31, (255, 255, 255, 255))  # fang
+    # Lower head
+    poly(d, [(38, 32), (52, 33), (56, 39), (42, 41)], (45, 38, 52, 255))
+    rect(d, 47, 35, 50, 37, (249, 115, 22, 255))
+
+    return add_outline(img)
+
+
+def make_medusa():
+    """Medusa — Górgona Esmeralda (64x64 mythic gorgon with serpent tail & snake hair)"""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Coiled Emerald Serpent Lower Body / Tail
+    poly(d, [(22, 39), (35, 39), (41, 50), (35, 58), (15, 58), (10, 51), (18, 47)], (22, 163, 74, 255))
+    poly(d, [(18, 49), (34, 49), (34, 56), (16, 56)], (74, 222, 128, 255))
+    # Tail tip curling left
+    poly(d, [(11, 52), (5, 45), (9, 43), (15, 50)], (21, 128, 61, 255))
+    # Golden scale belt
+    rect(d, 21, 38, 36, 41, (250, 204, 21, 255))
+
+    # Regal purple & gold gorgon corset/drape
+    poly(d, [(22, 28), (35, 28), (36, 39), (21, 39)], (107, 33, 168, 255))
+    rect(d, 26, 29, 31, 38, (147, 51, 234, 255))
+    rect(d, 27, 30, 30, 32, (74, 222, 128, 255))  # emerald jewel
+
+    # Writhing Emerald Serpent Hair behind & around head!
+    for pts in [
+        [(20, 17), (10, 12), (8, 16), (17, 21)],
+        [(21, 12), (14, 5), (18, 5), (24, 12)],
+        [(28, 10), (31, 3), (35, 6), (31, 12)],
+        [(34, 14), (44, 10), (45, 14), (36, 18)],
+        [(19, 23), (11, 27), (14, 30), (21, 26)],
+    ]:
+        poly(d, pts, (22, 163, 74, 255))
+        d.point(pts[1], fill=(250, 204, 21, 255))  # snake eye
+
+    # Head with pale jade-tinted skin & glowing violet petrifying eyes
+    draw_anime_head(
+        d, 28, 19,
+        skin=(220, 252, 231, 255),
+        skin_sh=(167, 243, 208, 255),
+        eye_main=(168, 85, 247, 255),
+        eye_hi=(255, 255, 255, 255),
+        hair_base=(21, 128, 61, 255),
+        hair_sh=(20, 83, 45, 255),
+        hair_hi=(74, 222, 128, 255),
+    )
+
+    # Raised arm casting glowing violet-green petrification orb
+    rect(d, 34, 30, 44, 34, (220, 252, 231, 255))
+    d.ellipse([44, 24, 56, 36], fill=(168, 85, 247, 255))
+    d.ellipse([47, 27, 53, 33], fill=(74, 222, 128, 255))
+    d.point((50, 30), fill=(255, 255, 255, 255))
+
+    return add_outline(img)
+
+
+def make_anubis():
+    """Anúbis — Guardião das Areias (64x64 Egyptian jackal-headed god warrior with golden khopesh)"""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Flowing desert-violet & gold waist sash
+    poly(d, [(21, 39), (11, 52), (18, 54), (26, 42)], (107, 33, 168, 255))
+
+    # Athletic dark-obsidian legs with golden greaves
+    poly(d, [(21, 43), (27, 43), (22, 56), (16, 56)], (30, 27, 36, 255))
+    rect(d, 16, 52, 24, 58, (234, 179, 8, 255))
+    poly(d, [(30, 43), (36, 43), (40, 56), (34, 56)], (30, 27, 36, 255))
+    rect(d, 34, 52, 43, 58, (250, 204, 21, 255))
+
+    # Egyptian shendyt skirt + broad golden-lapis pectoral collar
+    poly(d, [(20, 38), (37, 38), (39, 47), (19, 47)], (241, 245, 249, 255))
+    rect(d, 26, 38, 32, 47, (250, 204, 21, 255))
+    rect(d, 28, 40, 30, 45, (37, 99, 235, 255))
+    # Torso + golden collar
+    rect(d, 22, 28, 35, 39, (30, 27, 36, 255))
+    poly(d, [(18, 27), (39, 27), (36, 33), (21, 33)], (250, 204, 21, 255))
+    rect(d, 22, 29, 35, 31, (37, 99, 235, 255))
+
+    # Ornate Gold-and-Blue Nemes Headdress + Tall Jackal Head
+    poly(d, [(18, 15), (36, 15), (39, 29), (15, 29)], (234, 179, 8, 255))
+    for sy in (17, 21, 25):
+        d.line([(17, sy), (37, sy)], fill=(37, 99, 235, 255), width=2)
+    # Tall pointed black jackal ears
+    poly(d, [(22, 15), (20, 4), (26, 14)], (24, 24, 34, 255))
+    poly(d, [(29, 15), (31, 4), (34, 14)], (24, 24, 34, 255))
+    # Jackal snout facing right + glowing purple eye
+    poly(d, [(23, 14), (36, 14), (44, 20), (42, 24), (25, 24)], (24, 24, 34, 255))
+    rect(d, 32, 16, 36, 18, (192, 132, 252, 255))
+    d.point((34, 17), fill=(255, 255, 255, 255))
+
+    # Glowing Golden Khopesh / Was-Staff held forward
+    rect(d, 35, 31, 44, 35, (30, 27, 36, 255))
+    rect(d, 41, 31, 45, 35, (250, 204, 21, 255))
+    # Curved golden khopesh blade with purple soul energy
+    poly(d, [(44, 32), (51, 24), (58, 17), (60, 23), (53, 30), (46, 35)], (250, 204, 21, 255))
+    d.line([(47, 31), (57, 20)], fill=(254, 249, 195, 255), width=2)
+    for sx, sy in [(55, 14), (60, 18), (58, 27)]:
+        d.point((sx, sy), fill=(192, 132, 252, 255))
+
+    return add_outline(img)
+
+
+def make_freya():
+    """Freya — Valquíria Celeste (64x64 winged Norse valkyrie with white wings & celestial spear)"""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    # Radiant White Feathered Angelic Wings behind back
+    poly(d, [(22, 28), (4, 11), (8, 26), (13, 34), (24, 36)], (226, 232, 240, 255))
+    poly(d, [(22, 29), (9, 16), (12, 26), (22, 33)], (255, 255, 255, 255))
+    poly(d, [(33, 27), (47, 13), (45, 25), (36, 32)], (226, 232, 240, 255))
+    poly(d, [(34, 28), (44, 17), (42, 24)], (255, 255, 255, 255))
+
+    # Armored pearl & rose valkyrie boots
+    poly(d, [(22, 44), (27, 44), (23, 56), (18, 56)], (241, 245, 249, 255))
+    rect(d, 17, 54, 25, 58, (244, 114, 182, 255))
+    poly(d, [(29, 44), (35, 44), (39, 56), (33, 56)], (241, 245, 249, 255))
+    rect(d, 33, 54, 42, 58, (250, 204, 21, 255))
+
+    # Pearl-white & rose-gold valkyrie battle armor + pleated skirt
+    poly(d, [(21, 38), (36, 38), (40, 48), (17, 48)], (244, 114, 182, 255))
+    rect(d, 18, 46, 39, 48, (250, 204, 21, 255))
+    poly(d, [(22, 28), (35, 28), (36, 39), (21, 39)], (241, 245, 249, 255))
+    rect(d, 26, 29, 31, 38, (250, 204, 21, 255))
+    rect(d, 27, 31, 30, 34, (244, 114, 182, 255))
+
+    # Flowing golden-rose hair + Head + Winged Valkyrie Tiara
+    poly(d, [(19, 19), (14, 37), (22, 38), (24, 22)], (250, 204, 21, 255))
+    draw_anime_head(
+        d, 28, 19,
+        skin=(255, 234, 220, 255),
+        skin_sh=(236, 196, 176, 255),
+        eye_main=(244, 114, 182, 255),
+        eye_hi=(255, 255, 255, 255),
+        hair_base=(250, 204, 21, 255),
+        hair_sh=(202, 138, 4, 255),
+        hair_hi=(254, 249, 195, 255),
+        blush=(251, 113, 133, 255),
+    )
+    # Winged golden tiara
+    rect(d, 21, 12, 36, 14, (250, 204, 21, 255))
+    poly(d, [(21, 13), (15, 7), (23, 11)], (255, 255, 255, 255))
+    poly(d, [(35, 13), (41, 7), (33, 11)], (255, 255, 255, 255))
+
+    # Radiant Celestial Valkyrie Spear aimed forward
+    d.line([(20, 44), (58, 24)], fill=(250, 204, 21, 255), width=3)
+    poly(d, [(51, 26), (62, 20), (56, 30)], (244, 114, 182, 255))
+    poly(d, [(53, 26), (60, 22), (56, 28)], (255, 255, 255, 255))
+
+    return add_outline(img)
+
+
 def main():
     makers = {
         "ren": make_ren,
@@ -895,6 +1169,12 @@ def main():
         "nova": make_nova,
         "kael": make_kael,
         "tetsu": make_tetsu,
+        "fenrir": make_fenrir,
+        "ignis": make_ignis,
+        "cerberus": make_cerberus,
+        "medusa": make_medusa,
+        "anubis": make_anubis,
+        "freya": make_freya,
     }
     for name, fn in makers.items():
         sprite = fn()

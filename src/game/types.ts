@@ -10,7 +10,13 @@ export type HeroId =
   | 'drake'
   | 'nova'
   | 'kael'
-  | 'tetsu';
+  | 'tetsu'
+  | 'fenrir'
+  | 'ignis'
+  | 'cerberus'
+  | 'medusa'
+  | 'anubis'
+  | 'freya';
 
 export type HeroRole =
   | 'Espadachim'

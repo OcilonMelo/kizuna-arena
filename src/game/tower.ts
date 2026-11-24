@@ -282,4 +282,83 @@ export const TOWER_FLOORS: TowerFloor[] = [
       },
     ],
   },
+  {
+    floor: 13,
+    name: 'Andar 13 — Fúria de Asgard',
+    subtitle: 'Fenrir e Freya lideram a investida nórdica com apoio da Fênix Ignis.',
+    statScale: 1.18,
+    enemyTeam: [
+      {
+        heroId: 'freya',
+        slot: { col: 'front', row: 'top' },
+        activeSkillIds: ['freya_valhalla_thrust', 'freya_war_song'],
+        ultimateId: 'freya_ult_asgard_judgment',
+      },
+      {
+        heroId: 'fenrir',
+        slot: { col: 'mid', row: 'bottom' },
+        activeSkillIds: ['fenrir_pounce', 'fenrir_frost_fang'],
+        ultimateId: 'fenrir_ult_ragnarok',
+      },
+      {
+        heroId: 'ignis',
+        slot: { col: 'back', row: 'center' },
+        activeSkillIds: ['ignis_rebirth_flame', 'ignis_ember_wings'],
+        ultimateId: 'ignis_ult_phoenix_rise',
+      },
+    ],
+  },
+  {
+    floor: 14,
+    name: 'Andar 14 — Submundo e Areias',
+    subtitle: 'Cérbero segura a frente enquanto Anúbis e Medusa controlam a arena.',
+    statScale: 1.21,
+    enemyTeam: [
+      {
+        heroId: 'cerberus',
+        slot: { col: 'front', row: 'center' },
+        activeSkillIds: ['cerberus_triple_bite', 'cerberus_hell_roar'],
+        ultimateId: 'cerberus_ult_tartarus',
+      },
+      {
+        heroId: 'anubis',
+        slot: { col: 'mid', row: 'top' },
+        activeSkillIds: ['anubis_khopesh_arc', 'anubis_sand_dash'],
+        ultimateId: 'anubis_ult_pyramid_wrath',
+      },
+      {
+        heroId: 'medusa',
+        slot: { col: 'back', row: 'bottom' },
+        activeSkillIds: ['medusa_gaze', 'medusa_vipers'],
+        ultimateId: 'medusa_ult_sanctuary',
+      },
+    ],
+  },
+  {
+    floor: 15,
+    name: 'Andar 15 — CHEFE MÍTICO: Panteão Primordial',
+    subtitle: 'As 3 criaturas mais temidas da mitologia juntas no topo da Torre!',
+    isBoss: true,
+    statScale: 1.25,
+    enemyTeam: [
+      {
+        heroId: 'cerberus',
+        slot: { col: 'front', row: 'center' },
+        activeSkillIds: ['cerberus_magma_slam', 'cerberus_hell_roar'],
+        ultimateId: 'cerberus_ult_tartarus',
+      },
+      {
+        heroId: 'fenrir',
+        slot: { col: 'mid', row: 'top' },
+        activeSkillIds: ['fenrir_pounce', 'fenrir_lunar_dash'],
+        ultimateId: 'fenrir_ult_ragnarok',
+      },
+      {
+        heroId: 'ignis',
+        slot: { col: 'back', row: 'bottom' },
+        activeSkillIds: ['ignis_solar_bloom', 'ignis_solar_flare'],
+        ultimateId: 'ignis_ult_phoenix_rise',
+      },
+    ],
+  },
 ];

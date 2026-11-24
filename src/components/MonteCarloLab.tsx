@@ -271,7 +271,7 @@ export const MonteCarloLab: React.FC<MonteCarloLabProps> = ({
           <span className="hub-eyebrow">SIMULAÇÃO REAL NO MOTOR DO JOGO</span>
           <h2>🧪 Laboratório Monte Carlo</h2>
           <p className="hub-play-sub">
-            Roda centenas de batalhas reais sem interface gráfica para medir probabilidades exatas de vitória e equilíbrio entre os 12 heróis.
+            Roda centenas de batalhas reais sem interface gráfica para medir probabilidades exatas de vitória e equilíbrio entre os {HERO_LIST.length} lutadores.
           </p>
         </div>
 
@@ -290,7 +290,7 @@ export const MonteCarloLab: React.FC<MonteCarloLabProps> = ({
             className={`nav-tab ${simMode === 'global' ? 'active' : ''}`}
             onClick={() => setSimMode('global')}
           >
-            📊 Ranking dos 12 Heróis
+            📊 Ranking ({HERO_LIST.length} Lutadores)
           </button>
         </div>
       </div>

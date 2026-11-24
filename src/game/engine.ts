@@ -54,13 +54,20 @@ function resolveProjectileStyle(heroId: HeroId, skill?: SkillDef): ProjectileSty
     case 'nova':
       return 'laser';
     case 'yuki':
+    case 'fenrir':
       return 'ice_lance';
     case 'kage':
       return 'shuriken';
     case 'kael':
+    case 'medusa':
       return 'soul_flame';
+    case 'ignis':
+    case 'cerberus':
+      return 'fireball';
     case 'ren':
     case 'drake':
+    case 'anubis':
+    case 'freya':
       return 'blade_wave';
     default:
       return 'orb';
