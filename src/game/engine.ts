@@ -114,6 +114,7 @@ export class BattleEngine {
         hp: maxHp,
         maxHp,
         shield: 0,
+        shieldTimer: 0,
         energy: 18,
         atk,
         defStat,
@@ -283,7 +284,7 @@ export class BattleEngine {
             this.spawnFloatingText(h.x, h.y - 62, 'CURA KIZUNA!', '#4ade80', 1.2);
           } else {
             this.applyStatus(h, h, { type: 'atkBuff', duration: 6, value: 0.35 });
-            h.shield += Math.round(h.maxHp * 0.15);
+            this.grantShield(h, Math.round(h.maxHp * 0.1), 4.5);
             this.spawnFloatingText(h.x, h.y - 62, 'FRENESI +35%!', '#f59e0b', 1.25);
             this.spawnParticles(h.x, h.y - 24, '#f59e0b', 18, 170);
           }
@@ -433,6 +434,13 @@ export class BattleEngine {
     if (h.attackAnim > 0) h.attackAnim = Math.max(0, h.attackAnim - dt);
     if (h.ultimateAura > 0) h.ultimateAura = Math.max(0, h.ultimateAura - dt);
     if (h.dodgeCooldown > 0) h.dodgeCooldown = Math.max(0, h.dodgeCooldown - dt);
+    if (h.shield > 0) {
+      h.shieldTimer -= dt;
+      if (h.shieldTimer <= 0) {
+        h.shield = 0;
+        h.shieldTimer = 0;
+      }
+    }
 
     if (Math.abs(h.hurtKnockX) > 0.1) {
       h.x = Math.max(FLOOR_MIN_X, Math.min(FLOOR_MAX_X, h.x + h.hurtKnockX * dt));
@@ -933,7 +941,7 @@ export class BattleEngine {
         for (const a of allies) {
           this.applyHeal(h, a, healAmt);
           if (skill.shieldRatio) {
-            a.shield += Math.round(a.maxHp * skill.shieldRatio);
+            this.grantShield(a, Math.round(a.maxHp * skill.shieldRatio), 4.5);
           }
           this.applyStatus(h, a, skill.statusEffect);
           this.vfx.push({
@@ -955,8 +963,8 @@ export class BattleEngine {
         sound.playShield();
         if (skill.shieldRatio) {
           const amt = Math.round(h.maxHp * skill.shieldRatio);
-          h.shield += amt;
-          this.spawnFloatingText(h.x, h.y - 56, `+${amt} ESCUDO`, '#60a5fa', 1.05);
+          const applied = this.grantShield(h, amt, 4.5);
+          this.spawnFloatingText(h.x, h.y - 56, `ESCUDO ${applied}`, '#60a5fa', 1.05);
         }
         this.vfx.push({
           id: uid('vfx'),
@@ -986,8 +994,8 @@ export class BattleEngine {
         for (const a of allies) {
           if (skill.shieldRatio) {
             const amt = Math.round(a.maxHp * skill.shieldRatio);
-            a.shield += amt;
-            this.spawnFloatingText(a.x, a.y - 54, `+${amt} ESCUDO`, '#60a5fa', 0.98);
+            const applied = this.grantShield(a, amt, 4.5);
+            this.spawnFloatingText(a.x, a.y - 54, `ESCUDO ${applied}`, '#60a5fa', 0.98);
           }
           if (skill.statusEffect) {
             this.applyStatus(h, a, skill.statusEffect);
@@ -1037,6 +1045,15 @@ export class BattleEngine {
     }
   }
 
+  private grantShield(target: HeroRuntime, amount: number, duration = 4.5): number {
+    if (!target.alive || amount <= 0) return 0;
+    const cap = Math.round(target.maxHp * 0.3);
+    const next = Math.min(cap, Math.max(target.shield, amount));
+    target.shield = next;
+    target.shieldTimer = Math.max(target.shieldTimer, duration);
+    return next;
+  }
+
   private applyHeal(source: HeroRuntime, target: HeroRuntime, amount: number): void {
     if (!target.alive) return;
     const actual = Math.min(target.maxHp - target.hp, amount);
@@ -1061,9 +1078,15 @@ export class BattleEngine {
     let dmg = Math.max(8, Math.round(rawDamage * reduction));
 
     if (target.shield > 0) {
+      const prevShield = target.shield;
       const absorbed = Math.min(target.shield, dmg);
       target.shield -= absorbed;
       dmg -= absorbed;
+      if (prevShield > 0 && target.shield === 0) {
+        target.shieldTimer = 0;
+        this.spawnParticles(target.x, target.y - 26, '#60a5fa', 12, 160);
+        this.spawnFloatingText(target.x, target.y - 64, 'ESCUDO QUEBRADO!', '#93c5fd', 0.95);
+      }
     }
 
     target.hp = Math.max(0, target.hp - dmg);
@@ -1103,7 +1126,7 @@ export class BattleEngine {
     if (target.hp > 0 && !target.awakened && target.hp <= target.maxHp * 0.25) {
       target.awakened = true;
       target.energy = Math.min(100, target.energy + 30);
-      target.shield += Math.round(target.maxHp * 0.12);
+      this.grantShield(target, Math.round(target.maxHp * 0.08), 3.5);
       target.ultimateAura = 1.2;
       sound.playAwaken();
       this.spawnFloatingText(target.x, target.y - 72, '⚡ DESPERTAR!', '#fde047', 1.3);

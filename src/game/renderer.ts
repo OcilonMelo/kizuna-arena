@@ -435,18 +435,18 @@ function drawHero(ctx: CanvasRenderingContext2D, h: HeroRuntime, assets: LoadedA
     : 1 + Math.sin(h.animTime * 4) * 0.03;
 
   const sprite = assets.sprites[h.heroId];
-  const drawSize = 102;
+  const drawSize = 118;
 
   ctx.save();
   ctx.translate(Math.round(h.x + lunge), Math.round(h.y - bob));
   ctx.scale(scaleX, scaleY);
 
   if (sprite) {
-    ctx.drawImage(sprite, -drawSize / 2, -drawSize + 16, drawSize, drawSize);
+    ctx.drawImage(sprite, -drawSize / 2, -drawSize + 14, drawSize, drawSize);
     if (h.hitFlash > 0) {
       ctx.globalCompositeOperation = 'source-atop';
       ctx.fillStyle = 'rgba(255,255,255,0.78)';
-      ctx.fillRect(-drawSize / 2, -drawSize + 16, drawSize, drawSize);
+      ctx.fillRect(-drawSize / 2, -drawSize + 14, drawSize, drawSize);
     }
   } else {
     ctx.fillStyle = h.hitFlash > 0 ? '#ffffff' : h.def.color;

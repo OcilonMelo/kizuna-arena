@@ -112,6 +112,7 @@ export interface HeroRuntime {
   hp: number;
   maxHp: number;
   shield: number;
+  shieldTimer: number;
   energy: number; // 0..100
   atk: number;
   defStat: number;
